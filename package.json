@@ -1,0 +1,62 @@
+{
+  "name": "panteon-leaderboard-web",
+  "version": "0.1.0",
+  "description": "Weekly leaderboard SPA. React 19 + Vite + TS + Tailwind + Zustand.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "start-server-and-test 'vite preview --port 4173' http://localhost:4173 'cypress run'",
+    "e2e:open": "start-server-and-test 'vite preview --port 4173' http://localhost:4173 'cypress open'",
+    "e2e:dev": "start-server-and-test dev http://localhost:5173 'cypress open'"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.0",
+    "react-router-dom": "^7.14.2",
+    "zod": "^3.23.8",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@testing-library/cypress": "^10.0.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "babel-plugin-react-compiler": "^19.0.0-beta-201e55d-20241215",
+    "cypress": "^13.17.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-cypress": "^4.1.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "react-scan": "^0.5.3",
+    "start-server-and-test": "^2.0.9",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.1",
+    "vite": "^6.0.5",
+    "vitest": "^3.0.0"
+  }
+}
