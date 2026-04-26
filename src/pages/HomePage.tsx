@@ -53,7 +53,7 @@ function Hero(): React.ReactElement {
     <section
       id="home"
       aria-label="Hero"
-      className="relative h-[calc(100vh-6rem)] min-h-[520px] w-full overflow-hidden bg-panteon-bg"
+      className="relative h-[480px] w-full overflow-hidden bg-panteon-bg"
     >
       {HERO_SLIDES.map((src, i) => (
         <div
@@ -62,27 +62,26 @@ function Hero(): React.ReactElement {
           className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000"
           style={{
             backgroundImage: `url(${src})`,
-            opacity: i === index ? 0.45 : 0,
+            opacity: i === index ? 0.6 : 0,
           }}
         />
       ))}
-      <div className="absolute inset-0 bg-panteon-bg/30" />
 
-      <div className="relative z-10 flex h-full flex-col items-center justify-center gap-14 px-4">
+      <div className="relative z-10 flex h-full flex-col items-center justify-center gap-10 px-4">
         <img
           src="/panteon/brand/logo.png"
           alt=""
           aria-hidden="true"
           width={555}
           height={95}
-          className="h-24 w-auto drop-shadow-2xl sm:h-32 md:h-40 lg:h-44"
+          className="h-20 w-auto drop-shadow-2xl sm:h-24 md:h-28 lg:h-32"
         />
         <a
           href="#about"
           aria-label="Scroll to about section"
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-panteon-orange text-panteon-fg shadow-lg transition-colors hover:bg-panteon-orange-deep"
+          className="flex h-12 w-12 items-center justify-center rounded-full bg-panteon-orange text-panteon-fg shadow-lg transition-colors hover:bg-panteon-orange-deep"
         >
-          <span aria-hidden="true" className="text-2xl">↓</span>
+          <span aria-hidden="true" className="text-xl">↓</span>
         </a>
       </div>
     </section>
@@ -91,7 +90,7 @@ function Hero(): React.ReactElement {
 
 function About(): React.ReactElement {
   return (
-    <section id="about" className="relative bg-panteon-orange-soft">
+    <section id="about" className="relative" style={{ backgroundColor: '#f7780b' }}>
       <img
         src="/panteon/badges/great-place-to-work.png"
         alt="Great Place to Work certified badge"
@@ -100,17 +99,15 @@ function About(): React.ReactElement {
         className="absolute -top-36 right-8 hidden h-52 w-auto drop-shadow-xl md:block lg:right-16"
         loading="lazy"
       />
-      <div className="mx-auto grid max-w-[1140px] gap-10 px-[15px] py-20 md:grid-cols-2 md:items-start">
-        <div>
-          <h2 className="text-[18px] font-semibold uppercase leading-[1.2] tracking-[2px] text-panteon-eyebrow">
-            About us
-          </h2>
-          <h3 className="mt-4 text-[32px] font-extrabold leading-[1.4] tracking-[0.8px] text-panteon-fg">
+      <div className="mx-auto max-w-[1140px] px-[15px] py-16">
+        <h2 className="text-center text-[18px] font-semibold uppercase leading-[1.2] tracking-[2px] text-panteon-eyebrow">
+          About us
+        </h2>
+        <div className="mt-8 grid gap-10 md:grid-cols-2 md:items-start">
+          <h3 className="text-[32px] font-extrabold leading-[1.4] tracking-[0.8px] text-panteon-fg">
             Through games,<br />adds colors to lives!
           </h3>
-        </div>
-        <div className="md:pt-14">
-          <p className="text-[15px] leading-[1.6] text-panteon-fg">
+          <p className="text-[15px] leading-[1.6] text-panteon-fg md:pt-3">
             Panteon&rsquo;s story started in 2012 with a simple ambition: build mobile games
             millions love. Data, craft, and the team behind every release keep that ambition alive.
           </p>

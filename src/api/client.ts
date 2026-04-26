@@ -1,7 +1,7 @@
 import type { z } from 'zod'
 import { ApiErrorBodySchema } from './schemas'
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
 
 export class ApiError extends Error {
   readonly status: number
