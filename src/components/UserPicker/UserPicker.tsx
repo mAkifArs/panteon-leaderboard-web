@@ -135,32 +135,41 @@ function ManualEntry({ onSelect }: ManualEntryProps): React.ReactElement {
         onSelect(trimmed)
       }}
       aria-label="Manual player id entry"
-      className="mt-10 flex flex-col gap-3 border-t border-panteon-border pt-8 sm:flex-row sm:items-end"
+      autoComplete="off"
+      className="mt-10 flex flex-col gap-2 border-t border-panteon-border pt-8"
     >
-      <div className="flex flex-1 flex-col gap-1">
-        <label
-          htmlFor="manual-userId"
-          className="text-[10px] font-semibold uppercase tracking-nav text-panteon-muted"
-        >
-          Or enter a player ID
-        </label>
+      <label
+        htmlFor="manual-userId"
+        className="text-[10px] font-semibold uppercase tracking-nav text-panteon-muted"
+      >
+        Or enter a player ID
+      </label>
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           id="manual-userId"
+          name="manual-userId"
           type="text"
           value={draft}
           onChange={(event) => {
             setDraft(event.target.value)
           }}
           placeholder="e.g. user_42"
-          className="w-full rounded-md border border-panteon-border bg-panteon-surface px-3 py-2 text-sm text-panteon-fg placeholder:text-panteon-muted/50 focus-visible:border-panteon-orange focus-visible:outline-none"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-form-type="other"
+          className="h-10 w-full flex-1 rounded-md border border-panteon-border bg-panteon-surface px-3 text-sm text-panteon-fg placeholder:text-panteon-muted/50 focus-visible:border-panteon-orange focus-visible:outline-none"
         />
+        <button
+          type="submit"
+          className="h-10 rounded-md border border-panteon-border bg-panteon-surface-2 px-4 text-xs font-semibold uppercase tracking-nav text-panteon-fg transition-colors hover:border-panteon-orange hover:text-panteon-orange focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-panteon-orange"
+        >
+          Continue
+        </button>
       </div>
-      <button
-        type="submit"
-        className="rounded-md border border-panteon-border bg-panteon-surface-2 px-4 py-2 text-xs font-semibold uppercase tracking-nav text-panteon-fg transition-colors hover:border-panteon-orange hover:text-panteon-orange focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-panteon-orange"
-      >
-        Continue
-      </button>
     </form>
   )
 }
