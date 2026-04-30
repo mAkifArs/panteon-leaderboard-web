@@ -60,7 +60,7 @@
   .podium-glow {
     background-image: radial-gradient(
       ellipse at center top,
-      rgba(245, 179, 1, 0.08),
+      rgba(245, 179, 1, 0.12),
       transparent 70%
     );
   }

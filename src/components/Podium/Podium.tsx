@@ -11,7 +11,10 @@ export function Podium({ entries }: PodiumProps): React.ReactElement | null {
 
   return (
     <section aria-label="Top 3 podium" className="relative mb-6 mt-6 px-1 md:mb-8 md:mt-8 md:px-6">
-      <div aria-hidden="true" className="podium-glow pointer-events-none absolute inset-0" />
+      <div
+        aria-hidden="true"
+        className="podium-glow pointer-events-none absolute inset-x-0 -top-12 bottom-0 md:-top-16"
+      />
 
       {/* Mobile: 1st on top spans 2 cols, 2nd + 3rd below */}
       <div className="relative grid grid-cols-2 gap-2.5 md:hidden">
