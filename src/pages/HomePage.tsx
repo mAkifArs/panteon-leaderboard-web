@@ -62,7 +62,6 @@ export function HomePage(): React.ReactElement {
       <About />
       <News />
       <Games />
-      <StoreBadges />
     </>
   )
 }
@@ -240,48 +239,6 @@ function Games(): React.ReactElement {
               View live demo
               <span aria-hidden="true">→</span>
             </Link>
-          </li>
-        </ul>
-      </div>
-    </section>
-  )
-}
-
-function StoreBadges(): React.ReactElement {
-  return (
-    <section aria-label="Get our games" className="border-y border-panteon-border bg-panteon-bg">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-[15px] py-10 md:flex-row md:justify-between">
-        <p className="text-sm uppercase tracking-nav text-panteon-muted">Available on</p>
-        <ul className="flex flex-wrap items-center justify-center gap-3">
-          <li>
-            <a href="#" aria-label="Download on the App Store" className="block">
-              <img
-                src="/panteon/brand/btn-app-store.png"
-                alt="App Store"
-                className="h-12 w-auto"
-                loading="lazy"
-              />
-            </a>
-          </li>
-          <li>
-            <a href="#" aria-label="Get it on Google Play" className="block">
-              <img
-                src="/panteon/brand/btn-play-store.png"
-                alt="Google Play"
-                className="h-12 w-auto"
-                loading="lazy"
-              />
-            </a>
-          </li>
-          <li>
-            <a href="#" aria-label="Explore on Huawei AppGallery" className="block">
-              <img
-                src="/panteon/brand/btn-huawei-store.png"
-                alt="Huawei AppGallery"
-                className="h-12 w-auto"
-                loading="lazy"
-              />
-            </a>
           </li>
         </ul>
       </div>
