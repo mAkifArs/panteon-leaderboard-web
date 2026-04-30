@@ -1,9 +1,14 @@
 # ADR-002: Zustand for shared state, not React Context
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-014](ADR-014-drop-zustand-polling-registry-suffices.md) on 2026-05-01
 - **Date:** 2026-04-24
 - **Deciders:** Mehmet Akif Arslan
 - **Tags:** #frontend #state-management #performance
+
+> **Superseded.** The polling registry (ADR-004) plus URL state
+> (ADR-006) plus local `useState` cover every shared-state need
+> this app actually has. No Zustand store was ever written.
+> See ADR-014 for the full reasoning.
 
 ## Context
 

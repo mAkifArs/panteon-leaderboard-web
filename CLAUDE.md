@@ -14,7 +14,11 @@ Backend is a separate repo per ADR-002 in the API repo.
 
 - React 19 + Vite + TypeScript (strict)
 - Tailwind CSS for styling, design tokens centralised in `tailwind.config.ts`
-- Zustand for state, granular selectors only
+- No global state container. Server data flows through the
+  module-scoped polling registry (`usePolling`); user identity
+  lives in URL + `localStorage`; UI state is local `useState`.
+  See ADR-014. Zustand can be reintroduced if a feature needs
+  cross-tree, non-URL, non-server state.
 - React Hook Form + Zod for any form
 - Vitest for unit/component tests, Playwright for E2E
 - react-scan in dev to audit re-renders
@@ -32,8 +36,9 @@ Backend is a separate repo per ADR-002 in the API repo.
 3. **Polling, not WebSockets.** 5 second interval, paused on
    `document.visibilityState === 'hidden'`, immediate refetch on
    return. ADR-003.
-4. **Zustand selectors are granular.** Never `useStore(s => s)` —
-   subscribe to the slice you read, nothing more.
+4. **Subscriptions are granular.** Whether reading from the
+   polling registry or any future store, subscribe to the slice
+   you read — nothing more.
 5. **Accessibility is not optional.** Every interactive element is
    a real button or link, focus styles visible, screen-reader
    labels for rank context. The `a11y-patterns` skill enforces this
@@ -85,9 +90,12 @@ bun run format
 
 ## Things we don't do
 
-- No Redux, no Context for shared state. Zustand only.
-- No `useEffect` for data fetching when a hook (`useLeaderboard`,
-  `useOwnRank`) can encapsulate it.
+- No Redux, no Context for shared state. Use the polling
+  registry, URL state, or local `useState` first; reach for
+  Zustand only if a feature genuinely needs cross-tree, non-URL,
+  non-server state (ADR-014).
+- No `useEffect` for data fetching when a hook
+  (`useLeaderboardView`, `useSampleUsers`) can encapsulate it.
 - No raw hex colours in JSX. Tailwind tokens only.
 - No inline styles. Tailwind utility classes only.
 - No `<div onClick>`. Use real semantic elements.
