@@ -63,8 +63,6 @@ export function HomePage(): React.ReactElement {
       <News />
       <Games />
       <StoreBadges />
-      <Career />
-      <Contact />
     </>
   )
 }
@@ -291,61 +289,3 @@ function StoreBadges(): React.ReactElement {
   )
 }
 
-function Career(): React.ReactElement {
-  return (
-    <section id="career" className="bg-panteon-bg">
-      <div className="mx-auto flex max-w-[1140px] flex-col items-start gap-6 px-[15px] py-16 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-[18px] font-semibold uppercase leading-[1.2] tracking-[2px] text-panteon-eyebrow">
-            Career
-          </h2>
-          <h3 className="mt-3 text-[32px] font-extrabold leading-[1.4] tracking-[0.8px] text-panteon-fg">
-            Build games millions play
-          </h3>
-          <p className="mt-3 max-w-xl text-[15px] leading-[1.6] text-panteon-muted">
-            We&rsquo;re always looking for engineers, designers, and producers who want to ship at
-            scale.
-          </p>
-        </div>
-        <a
-          href="#"
-          className="inline-flex h-9 items-center gap-2 rounded-lg border border-panteon-fg px-5 text-[15px] font-medium uppercase text-panteon-fg transition-colors hover:border-panteon-orange hover:text-panteon-orange"
-        >
-          See open roles
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
-    </section>
-  )
-}
-
-function Contact(): React.ReactElement {
-  return (
-    <section id="contact" className="border-t border-panteon-border bg-panteon-bg">
-      <div className="mx-auto grid max-w-[1140px] gap-8 px-[15px] py-16 sm:grid-cols-2">
-        <div>
-          <h2 className="text-[18px] font-semibold uppercase leading-[1.2] tracking-[2px] text-panteon-eyebrow">
-            Contact us
-          </h2>
-          <h3 className="mt-3 text-[32px] font-extrabold leading-[1.4] tracking-[0.8px] text-panteon-fg">
-            Get in touch
-          </h3>
-          <p className="mt-3 text-[15px] leading-[1.6] text-panteon-muted">
-            ODTÜ Teknokent, Ankara · TR
-          </p>
-        </div>
-        <ul className="flex flex-col gap-2 text-[15px] text-panteon-muted">
-          <li>
-            <span className="text-panteon-fg">Press:</span> press@panteon.example
-          </li>
-          <li>
-            <span className="text-panteon-fg">Careers:</span> careers@panteon.example
-          </li>
-          <li>
-            <span className="text-panteon-fg">Business:</span> hello@panteon.example
-          </li>
-        </ul>
-      </div>
-    </section>
-  )
-}
