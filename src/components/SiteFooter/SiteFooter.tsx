@@ -14,9 +14,9 @@ export function SiteFooter(): React.ReactElement {
           <img
             src="/panteon/brand/logo.png"
             alt="Panteon"
-            width={120}
-            height={20}
-            className="h-5 w-auto"
+            width={164}
+            height={28}
+            className="h-7 w-auto object-contain"
           />
           <span className="text-xs text-panteon-muted">
             Leaderboard case study · not affiliated with Panteon Games
