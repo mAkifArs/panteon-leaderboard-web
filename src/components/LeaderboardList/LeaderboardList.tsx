@@ -19,6 +19,15 @@ export interface LeaderboardListHandle {
    * full reveal step (no half-revealed pages).
    */
   ensureRankVisible: (rank: number) => void
+  /**
+   * Reveal every row in one shot. Used before a Jump-to-me scroll
+   * for players outside the top 100, so the cluster section
+   * (which sits below the list) is in its final position before
+   * we compute the smooth-scroll target. Without this, the
+   * sentinel reveals more rows mid-scroll and the cluster slides
+   * down so the user lands short of where they asked to go.
+   */
+  revealAll: () => void
 }
 
 const PAGE_SIZE = 20
@@ -75,6 +84,18 @@ export const LeaderboardList = forwardRef<LeaderboardListHandle, LeaderboardList
           })
           // Skip the loading delay for explicit jumps — the user
           // is asking to *go there*, not browse.
+          setRevealLoading(false)
+          if (revealTimerRef.current !== null) {
+            window.clearTimeout(revealTimerRef.current)
+            revealTimerRef.current = null
+          }
+        },
+        revealAll: () => {
+          setRevealed((prev) => {
+            if (prev >= entries.length) return prev
+            prevRevealedRef.current = prev
+            return entries.length
+          })
           setRevealLoading(false)
           if (revealTimerRef.current !== null) {
             window.clearTimeout(revealTimerRef.current)

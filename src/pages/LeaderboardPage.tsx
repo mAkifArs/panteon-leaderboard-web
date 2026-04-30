@@ -78,10 +78,19 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
 
   const handleJump = (): void => {
     if (!me) return
-    // Outside top 100: cluster is its own section, always
-    // mounted when me.rank > 100. Just scroll.
+    // Outside top 100: the cluster section sits below the list,
+    // so any reveal that fires mid-scroll grows the list and
+    // pushes the cluster down — leaving the user short of the
+    // target. Reveal the whole list up front so the cluster's
+    // final position is locked in before we compute the scroll
+    // target. Double rAF waits for layout after the reveal commit.
     if (me.rank > 100) {
-      if (clusterEl) scrollToEl(clusterEl)
+      listRef.current?.revealAll()
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (clusterEl) scrollToEl(clusterEl)
+        })
+      })
       return
     }
     // Inside top 100 (rank > 3 enforced by StickySelfBar):
