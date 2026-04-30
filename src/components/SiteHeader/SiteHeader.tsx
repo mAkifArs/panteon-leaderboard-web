@@ -5,16 +5,26 @@ const NAV_ITEMS = [
   { label: 'About', to: '/#about' },
   { label: "What's Going On", to: '/#news' },
   { label: 'Games', to: '/#games' },
-  { label: 'Career', to: '/#career' },
-  { label: 'Contact Us', to: '/#contact' },
 ] as const
+
+// Hysteresis prevents the height animation from oscillating when
+// the user lands near a single threshold (trackpad inertia or the
+// header's own collapse-induced layout shift can re-cross a single
+// trigger). The 50px gap between SHRINK and GROW absorbs that.
+const SHRINK_AT = 80
+const GROW_AT = 30
 
 export function SiteHeader(): React.ReactElement {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const onScroll = (): void => {
-      setScrolled(window.scrollY > 50)
+      setScrolled((prev) => {
+        const y = window.scrollY
+        if (!prev && y > SHRINK_AT) return true
+        if (prev && y < GROW_AT) return false
+        return prev
+      })
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
