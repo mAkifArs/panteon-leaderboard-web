@@ -71,7 +71,7 @@ trigger:
 
 ### Alternative A: TanStack Query
 
-Industry standard for server-state. Rejected for *this scope* on
+Industry standard for server-state. Rejected for _this scope_ on
 YAGNI grounds — we'd use ~5% of the surface area and ship
 ~13 KB gzipped for it.
 

@@ -31,7 +31,7 @@ interface Props {
   // TODO
 }
 
-export default function <Name>({ }: Props) {
+export default function <Name>({}: Props) {
   return null
 }
 ```

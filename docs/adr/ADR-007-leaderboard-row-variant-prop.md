@@ -87,7 +87,7 @@ call site, and Storybook stories become awkward.
 
 Claude initially leaned toward Alternative A (four components) —
 the "single responsibility per file" reflex. Pushback was a
-Discussion about what *changes together*: a row's structure
+Discussion about what _changes together_: a row's structure
 changes together across all four variants 90% of the time. That
 flipped the recommendation. Decision is mine; the reasoning
 walk came faster with AI.

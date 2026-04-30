@@ -44,12 +44,15 @@ readable side-by-side.
 ## Consequences
 
 ### Positive
+
 ### Negative
+
 ### Neutral
 
 ## Alternatives Considered
 
 ### Alternative A: <name>
+
 ### Alternative B: <name>
 
 ## AI involvement

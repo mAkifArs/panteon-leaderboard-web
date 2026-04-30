@@ -39,14 +39,14 @@ src/components/LeaderboardRow/
 
 ```ts
 // Good
-const myRank = useLeaderboardStore(s => s.myRank)
-const top10 = useLeaderboardStore(s => s.entries.slice(0, 10))
+const myRank = useLeaderboardStore((s) => s.myRank)
+const top10 = useLeaderboardStore((s) => s.entries.slice(0, 10))
 
 // Bad — subscribes to the entire store
-const store = useLeaderboardStore(s => s)
+const store = useLeaderboardStore((s) => s)
 
 // Bad — creates a new object every render
-const both = useLeaderboardStore(s => ({ a: s.a, b: s.b }))
+const both = useLeaderboardStore((s) => ({ a: s.a, b: s.b }))
 // (use shallow comparator if combined slices are truly needed)
 ```
 

@@ -7,8 +7,8 @@
 
 ## Context
 
-ADR-003 settled the *strategy* (polling, not WebSockets). This ADR
-settles the *implementation*: how the hook is shaped, where the
+ADR-003 settled the _strategy_ (polling, not WebSockets). This ADR
+settles the _implementation_: how the hook is shaped, where the
 timer lives, and what happens when the tab is hidden, the network
 flakes, or the same hook is mounted twice.
 
@@ -55,7 +55,7 @@ Components import the wrappers, never `usePolling` directly.
 ### Negative
 
 - Module-scoped registry is a small piece of global state outside
-  Zustand. Acceptable because it's *cache-of-server-state*, not
+  Zustand. Acceptable because it's _cache-of-server-state_, not
   app state, and it's keyed (no leakage across resources).
 - Test isolation needs care: the registry survives between tests
   unless explicitly reset. We export a `__resetPollingRegistry()`
@@ -72,7 +72,7 @@ Components import the wrappers, never `usePolling` directly.
 ### Alternative A: One `setInterval` per `useEffect`, no sharing
 
 Simplest possible implementation. Rejected because the leaderboard
-page mounts the cluster cell inside `<LeaderboardList>` *and*
+page mounts the cluster cell inside `<LeaderboardList>` _and_
 inside `<OwnRankCluster>` — the same data fetched twice, two
 timers, double the request load.
 

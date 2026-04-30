@@ -18,7 +18,7 @@ deliverable we need a way to:
 2. Let the reviewer change the player they're impersonating
    without a rebuild.
 3. Survive a page reload.
-4. Not pretend to be auth — anything that *looks* like login is
+4. Not pretend to be auth — anything that _looks_ like login is
    misleading and out of scope.
 
 ## Decision
@@ -72,7 +72,7 @@ Rejected on UX grounds — too much friction for evaluation.
 ### Alternative B: Hard-coded test user
 
 Single demo player, no picker. Rejected because the brief asks
-for *competitive* leaderboard UX — showing it from one player's
+for _competitive_ leaderboard UX — showing it from one player's
 perspective hides behaviour at top, middle, and bottom of the
 ranking.
 

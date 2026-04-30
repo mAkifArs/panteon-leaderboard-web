@@ -11,12 +11,12 @@ file teaches the conventions.
 
 ## Layers
 
-| Layer       | Tool       | What it covers                                         |
-|-------------|------------|--------------------------------------------------------|
-| Unit        | Vitest     | Pure functions (rank-window math, formatters)          |
-| Component   | Vitest + RTL | Single component renders, prop variants, a11y roles   |
-| Integration | Vitest     | Hook + Zustand store, polling lifecycle               |
-| E2E         | Playwright | One full user flow per page (top-100 → own-rank cluster) |
+| Layer       | Tool         | What it covers                                           |
+| ----------- | ------------ | -------------------------------------------------------- |
+| Unit        | Vitest       | Pure functions (rank-window math, formatters)            |
+| Component   | Vitest + RTL | Single component renders, prop variants, a11y roles      |
+| Integration | Vitest       | Hook + Zustand store, polling lifecycle                  |
+| E2E         | Playwright   | One full user flow per page (top-100 → own-rank cluster) |
 
 ## What we always test
 

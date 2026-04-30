@@ -15,7 +15,7 @@ Integration. Plan mode does not replace Discussion; it answers
 "how", not "why".
 
 This applies on the frontend too — maybe more, because UI is
-where shallow AI output is hardest to spot. Code that *looks*
+where shallow AI output is hardest to spot. Code that _looks_
 right can have accessibility holes, re-render storms, or
 component APIs that fall apart on the second use case.
 
@@ -42,7 +42,7 @@ UI with this specific shape (top-100 + own-rank cluster +
 polling + reset countdown) before. AI helped me ramp on:
 
 - **react-window virtualisation** trade-offs. I asked Claude
-  *"at what list size does virtualisation pay off"* before
+  _"at what list size does virtualisation pay off"_ before
   reaching for it. Answer: not at 100 rows. Plain rendering
   ships, virtualisation skipped.
 - **Polling-vs-WebSockets** pros and cons enumeration. The
@@ -60,7 +60,7 @@ they cost me an hour of reading-and-deciding.
 ## Component API design — discussion-first
 
 Component APIs are where shallow AI output hurts most because
-the cost surfaces *the second time you reuse the component*,
+the cost surfaces _the second time you reuse the component_,
 not the first. Every component with non-trivial API ran through
 Discussion before code:
 
@@ -70,8 +70,8 @@ Discussion before code:
 <LeaderboardRow entry={entry} variant="top3" | "normal" | "self" | "neighbour" />
 ```
 
-Discussion question I asked Claude: *"would you build this as one
-component with a variant prop, or four separate components?"*
+Discussion question I asked Claude: _"would you build this as one
+component with a variant prop, or four separate components?"_
 Claude initially leaned toward four. After walking through the
 shared structure (90% identical), the variant-prop version won.
 This is a Decision I can defend, not a default.
@@ -107,8 +107,8 @@ clock assumptions. One `setInterval`, cleaned up on unmount.
 
 ## State management — Zustand, not Context
 
-Discussion: *"if 100 rows subscribe to the same Context, what
-happens on every leaderboard tick?"* Answer: 100 re-renders.
+Discussion: _"if 100 rows subscribe to the same Context, what
+happens on every leaderboard tick?"_ Answer: 100 re-renders.
 Zustand with selectors gives O(1) re-renders per tick — only the
 row whose data changed.
 
@@ -131,8 +131,8 @@ ADR-003.
 
 ## Accessibility — non-negotiable
 
-Discussion question I asked early: *"what are the three things
-most React leaderboards get wrong on accessibility?"* Answer:
+Discussion question I asked early: _"what are the three things
+most React leaderboards get wrong on accessibility?"_ Answer:
 `<div onClick>` instead of buttons, no rank context for screen
 readers, no keyboard nav for the own-rank cluster.
 

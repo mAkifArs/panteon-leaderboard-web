@@ -13,19 +13,19 @@ holes, polling logic that fires twice, layout regressions on
 mobile. A single "vitest" target doesn't cover any of those well.
 
 The backend repo runs three test layers (unit / integration / load).
-We mirror the *idea* — separate concerns, separate tools — without
-copying the *layers*.
+We mirror the _idea_ — separate concerns, separate tools — without
+copying the _layers_.
 
 ## Decision
 
 Four independent layers, each with a clear blast radius:
 
-| Layer            | Tool             | Scope                                      | Where                |
-|------------------|------------------|--------------------------------------------|----------------------|
-| Unit             | Vitest           | Pure functions, hooks via `renderHook`     | Co-located `*.test.ts`|
-| Component        | Vitest + RTL     | One component, mocked data, a11y assertions| Co-located `*.test.tsx`|
-| End-to-end       | Cypress          | Real browser, real API (or `cy.intercept` stubs) | `cypress/e2e/`  |
-| Re-render audit  | react-scan + Cypress | Manual + scripted check on the leaderboard tick | `cypress/e2e/render-audit.cy.ts` |
+| Layer           | Tool                 | Scope                                            | Where                            |
+| --------------- | -------------------- | ------------------------------------------------ | -------------------------------- |
+| Unit            | Vitest               | Pure functions, hooks via `renderHook`           | Co-located `*.test.ts`           |
+| Component       | Vitest + RTL         | One component, mocked data, a11y assertions      | Co-located `*.test.tsx`          |
+| End-to-end      | Cypress              | Real browser, real API (or `cy.intercept` stubs) | `cypress/e2e/`                   |
+| Re-render audit | react-scan + Cypress | Manual + scripted check on the leaderboard tick  | `cypress/e2e/render-audit.cy.ts` |
 
 Rules:
 
@@ -80,7 +80,7 @@ of bug only a real viewport catches. Rejected.
 ### Alternative B: Playwright instead of Cypress
 
 Broader browser matrix (WebKit), better trace viewer, faster
-parallelisation. Rejected for *this delivery window* on
+parallelisation. Rejected for _this delivery window_ on
 familiarity grounds — every prior project in the workspace
 (`onewell-case-study`, `insider-one-case`) uses Cypress, so
 ramp-up cost is zero. We accept losing real-Safari coverage and
@@ -92,7 +92,7 @@ not this-project's.
 
 Cheaper to maintain. Rejected because ADR-002 made an explicit
 performance promise (one row re-render per tick) and there's no
-*other* way to verify it stays true as the codebase grows.
+_other_ way to verify it stays true as the codebase grows.
 
 ## AI involvement
 

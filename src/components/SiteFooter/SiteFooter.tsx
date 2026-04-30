@@ -4,12 +4,7 @@
  * a case study, not the live company site.
  */
 
-const LEGAL_LINKS = [
-  'Privacy Policy',
-  'Cookie Policy',
-  'Terms of Use',
-  'Data Protection',
-] as const
+const LEGAL_LINKS = ['Privacy Policy', 'Cookie Policy', 'Terms of Use', 'Data Protection'] as const
 
 export function SiteFooter(): React.ReactElement {
   return (

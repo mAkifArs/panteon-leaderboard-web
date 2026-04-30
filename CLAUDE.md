@@ -48,7 +48,7 @@ Every non-trivial task runs in three phases, in this order:
 1. **Discussion.** Talk through the goal and trade-offs first.
    Component API design, state shape, fetching strategy — all
    discussed before code.
-2. **Decision.** Single sentence: *"We will do X because Y."*
+2. **Decision.** Single sentence: _"We will do X because Y."_
    Architectural calls also get an ADR via `/adr <slug>`.
 3. **Integration.** Only now do we write code. Tests verify
    behaviour, commits reference the ADR.

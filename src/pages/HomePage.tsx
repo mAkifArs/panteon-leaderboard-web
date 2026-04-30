@@ -9,18 +9,50 @@ const HERO_SLIDES = [
 ] as const
 
 const GAMES = [
-  { title: 'Arcane Arena: Tower Defense TD', tagline: 'Outlast rivals. Rule the arena.', img: '/panteon/games/arcane-arena.png' },
-  { title: 'Raid Rush: Tower Defense TD', tagline: 'Pick a strategy. Take the win.', img: '/panteon/games/raid-rush.png' },
-  { title: 'Airport Master!', tagline: 'Meet passengers, manage flights.', img: '/panteon/games/airport-master.png' },
-  { title: 'Trading Master', tagline: 'Trade fidgets, become a master.', img: '/panteon/games/trading-master.png' },
+  {
+    title: 'Arcane Arena: Tower Defense TD',
+    tagline: 'Outlast rivals. Rule the arena.',
+    img: '/panteon/games/arcane-arena.png',
+  },
+  {
+    title: 'Raid Rush: Tower Defense TD',
+    tagline: 'Pick a strategy. Take the win.',
+    img: '/panteon/games/raid-rush.png',
+  },
+  {
+    title: 'Airport Master!',
+    tagline: 'Meet passengers, manage flights.',
+    img: '/panteon/games/airport-master.png',
+  },
+  {
+    title: 'Trading Master',
+    tagline: 'Trade fidgets, become a master.',
+    img: '/panteon/games/trading-master.png',
+  },
   { title: 'Ball Brawl!', tagline: 'Build your team.', img: '/panteon/games/ball-brawl.png' },
 ] as const
 
 const NEWS = [
-  { title: 'Arcane Arena: Tower Defense TD is Now Live!', img: '/panteon/news/arcane-launch.jpg', date: 'Feb 2026' },
-  { title: 'Panteon Pitstop 2025: Strategy, Fun, and Team Spirit', img: '/panteon/news/pitstop-2025.jpg', date: 'Oct 2025' },
-  { title: 'Panteon celebrated its 13th anniversary at ODTÜ Teknokent', img: '/panteon/news/anniversary-13.jpg', date: 'Sep 2025' },
-  { title: 'Raid Rush x Terminator 2: Judgment Day — Starts May 1!', img: '/panteon/news/rr-t2.jpg', date: 'Apr 2025' },
+  {
+    title: 'Arcane Arena: Tower Defense TD is Now Live!',
+    img: '/panteon/news/arcane-launch.jpg',
+    date: 'Feb 2026',
+  },
+  {
+    title: 'Panteon Pitstop 2025: Strategy, Fun, and Team Spirit',
+    img: '/panteon/news/pitstop-2025.jpg',
+    date: 'Oct 2025',
+  },
+  {
+    title: 'Panteon celebrated its 13th anniversary at ODTÜ Teknokent',
+    img: '/panteon/news/anniversary-13.jpg',
+    date: 'Sep 2025',
+  },
+  {
+    title: 'Raid Rush x Terminator 2: Judgment Day — Starts May 1!',
+    img: '/panteon/news/rr-t2.jpg',
+    date: 'Apr 2025',
+  },
 ] as const
 
 export function HomePage(): React.ReactElement {
@@ -81,7 +113,9 @@ function Hero(): React.ReactElement {
           aria-label="Scroll to about section"
           className="flex h-12 w-12 items-center justify-center rounded-full bg-panteon-orange text-panteon-fg shadow-lg transition-colors hover:bg-panteon-orange-deep"
         >
-          <span aria-hidden="true" className="text-xl">↓</span>
+          <span aria-hidden="true" className="text-xl">
+            ↓
+          </span>
         </a>
       </div>
     </section>
@@ -105,7 +139,9 @@ function About(): React.ReactElement {
         </h2>
         <div className="mt-8 grid gap-10 md:grid-cols-2 md:items-start">
           <h3 className="text-[32px] font-extrabold leading-[1.4] tracking-[0.8px] text-panteon-fg">
-            Through games,<br />adds colors to lives!
+            Through games,
+            <br />
+            adds colors to lives!
           </h3>
           <p className="text-[15px] leading-[1.6] text-panteon-fg md:pt-3">
             Panteon&rsquo;s story started in 2012 with a simple ambition: build mobile games
@@ -142,7 +178,9 @@ function News(): React.ReactElement {
                   />
                 </div>
                 <div className="flex flex-col gap-2 p-4">
-                  <span className="text-[11px] uppercase tracking-[0.5px] text-panteon-muted">{item.date}</span>
+                  <span className="text-[11px] uppercase tracking-[0.5px] text-panteon-muted">
+                    {item.date}
+                  </span>
                   <h3 className="text-[19px] font-bold leading-[1.3] tracking-[0.4px] text-panteon-fg">
                     {item.title}
                   </h3>
@@ -215,9 +253,7 @@ function StoreBadges(): React.ReactElement {
   return (
     <section aria-label="Get our games" className="border-y border-panteon-border bg-panteon-bg">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-[15px] py-10 md:flex-row md:justify-between">
-        <p className="text-sm uppercase tracking-nav text-panteon-muted">
-          Available on
-        </p>
+        <p className="text-sm uppercase tracking-nav text-panteon-muted">Available on</p>
         <ul className="flex flex-wrap items-center justify-center gap-3">
           <li>
             <a href="#" aria-label="Download on the App Store" className="block">
@@ -267,7 +303,8 @@ function Career(): React.ReactElement {
             Build games millions play
           </h3>
           <p className="mt-3 max-w-xl text-[15px] leading-[1.6] text-panteon-muted">
-            We&rsquo;re always looking for engineers, designers, and producers who want to ship at scale.
+            We&rsquo;re always looking for engineers, designers, and producers who want to ship at
+            scale.
           </p>
         </div>
         <a
