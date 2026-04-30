@@ -21,3 +21,85 @@
     @apply outline-none ring-2 ring-panteon-accent ring-offset-2 ring-offset-panteon-bg;
   }
 }
+
+@layer components {
+  .avatar-bg {
+    background: linear-gradient(
+      135deg,
+      oklch(0.55 0.12 var(--avatar-h, 30)),
+      oklch(0.32 0.1 calc(var(--avatar-h, 30) + 40))
+    );
+  }
+
+  .live-dot {
+    box-shadow: 0 0 8px theme('colors.trend.up');
+  }
+
+  .shadow-self-bar {
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(245, 130, 32, 0.2);
+  }
+
+  .hero-stripes {
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0 24px,
+      rgba(245, 130, 32, 0.025) 24px 25px
+    );
+  }
+
+  .hero-glow {
+    background-image: radial-gradient(
+      circle 200px at top right,
+      rgba(245, 130, 32, 0.15),
+      transparent 60%
+    );
+  }
+
+  .podium-glow {
+    background-image: radial-gradient(
+      ellipse at center top,
+      rgba(245, 179, 1, 0.08),
+      transparent 70%
+    );
+  }
+}
+
+@keyframes lb-jump-pulse {
+  0% {
+    background-color: rgba(245, 130, 32, 0.22);
+  }
+  100% {
+    background-color: rgba(245, 130, 32, 0);
+  }
+}
+
+.lb-jump-pulse {
+  animation: lb-jump-pulse 1.5s ease-out 1;
+}
+
+@keyframes lb-row-in {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lb-row-in {
+  animation: lb-row-in 280ms ease-out both;
+}
+
+@keyframes lb-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lb-spinner {
+  animation: lb-spinner 0.8s linear infinite;
+}
