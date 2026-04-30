@@ -1,99 +1,64 @@
-import { useOwnRank } from '@/hooks/useOwnRank'
+import type { OwnRankPayload } from '@/api/schemas'
 import { LeaderboardRow } from '@/components/LeaderboardRow'
 
 interface OwnRankClusterProps {
-  userId: string | null
+  me: OwnRankPayload | null
+  userId: string
+  loading: boolean
+  error: Error | undefined
 }
 
-export function OwnRankCluster({ userId }: OwnRankClusterProps): React.ReactElement {
-  const { data, error, isLoading } = useOwnRank(userId)
+const containerClass =
+  'overflow-hidden rounded-xl border border-panteon-border bg-panteon-surface-3'
 
-  if (!userId) {
+export function OwnRankCluster({
+  me,
+  userId,
+  loading,
+  error,
+}: OwnRankClusterProps): React.ReactElement {
+  if (loading && me === null && !error) {
+    return <SkeletonCluster />
+  }
+
+  if (error && me === null) {
     return (
-      <Shell title="Your rank">
+      <div className={`${containerClass} p-4`} role="alert">
+        <p className="text-sm text-red-300">Failed to load: {error.message}</p>
+      </div>
+    )
+  }
+
+  if (me === null) {
+    return (
+      <div className={`${containerClass} p-6`}>
         <p className="text-sm text-panteon-muted">
-          Pick a player to see their cluster.
+          No earnings yet this week. Play a round to claim a rank.
         </p>
-      </Shell>
-    )
-  }
-
-  if (isLoading && !data) {
-    return (
-      <Shell title="Your rank">
-        <SkeletonCluster />
-      </Shell>
-    )
-  }
-
-  if (error) {
-    return (
-      <Shell title="Your rank">
-        <p role="alert" className="text-sm text-red-300">
-          Failed to load: {error.message}
-        </p>
-      </Shell>
-    )
-  }
-
-  if (!data) {
-    return (
-      <Shell title="Your rank">
-        <p className="text-sm text-panteon-muted">
-          No earnings yet this week.
-        </p>
-      </Shell>
+      </div>
     )
   }
 
   return (
-    <Shell
-      title="Your rank"
-      meta={`#${data.rank.toString()} of ${data.totalPlayers.toLocaleString('en-US')}`}
-    >
-      <ol className="flex flex-col gap-2">
-        {data.cluster.map((entry) => (
-          <LeaderboardRow
-            key={entry.userId}
-            entry={entry}
-            variant={entry.externalId === userId ? 'self' : 'neighbour'}
-          />
-        ))}
-      </ol>
-    </Shell>
-  )
-}
-
-function Shell({
-  title,
-  meta,
-  children,
-}: {
-  title: string
-  meta?: string
-  children: React.ReactNode
-}): React.ReactElement {
-  return (
-    <section
-      aria-label={title}
-      className="rounded-2xl border border-panteon-border bg-panteon-surface p-4"
-    >
-      <header className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-xs uppercase tracking-nav text-panteon-muted">{title}</h2>
-        {meta && <span className="font-mono text-xs tabular-nums text-panteon-muted">{meta}</span>}
-      </header>
-      {children}
-    </section>
+    <ol role="table" className={containerClass}>
+      {me.cluster.map((entry) => (
+        <LeaderboardRow
+          key={entry.userId}
+          entry={entry}
+          variant={entry.userId === userId ? 'self' : 'neighbour'}
+        />
+      ))}
+    </ol>
   )
 }
 
 function SkeletonCluster(): React.ReactElement {
   return (
-    <ol className="flex flex-col gap-2" aria-busy="true">
+    <ol className={containerClass} aria-busy="true">
       {Array.from({ length: 6 }).map((_, i) => (
         <li
           key={`skel-${i.toString()}`}
-          className="h-14 animate-pulse-soft rounded-xl border border-panteon-border bg-panteon-surface-2"
+          className="h-12 animate-pulse-soft border-t border-panteon-border bg-panteon-surface-2/30"
         />
       ))}
     </ol>

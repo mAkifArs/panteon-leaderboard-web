@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { nextResetAt } from '@/lib/iso-week'
 
+function pad(n: number): string {
+  return n.toString().padStart(2, '0')
+}
+
 function formatRemaining(ms: number): string {
   const sec = Math.max(0, Math.floor(ms / 1000))
   const d = Math.floor(sec / 86400)
@@ -12,24 +16,50 @@ function formatRemaining(ms: number): string {
   return `${m.toString()}m ${s.toString()}s`
 }
 
-export function CountdownToReset(): React.ReactElement {
-  const [remaining, setRemaining] = useState(() => nextResetAt().getTime() - Date.now())
+function formatRemainingCompact(ms: number): string {
+  const sec = Math.max(0, Math.floor(ms / 1000))
+  const d = Math.floor(sec / 86400)
+  const h = Math.floor((sec % 86400) / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  const s = sec % 60
+  return `${d.toString()}d ${pad(h)}:${pad(m)}:${pad(s)}`
+}
+
+interface CountdownToResetProps {
+  weekEnd?: string | undefined
+  compact?: boolean
+}
+
+function resolveResetMs(weekEnd: string | undefined): number {
+  if (weekEnd) {
+    const t = Date.parse(weekEnd)
+    if (!Number.isNaN(t)) return t - Date.now()
+  }
+  return nextResetAt().getTime() - Date.now()
+}
+
+export function CountdownToReset({
+  weekEnd,
+  compact = false,
+}: CountdownToResetProps = {}): React.ReactElement {
+  const [remaining, setRemaining] = useState(() => resolveResetMs(weekEnd))
 
   useEffect(() => {
+    setRemaining(resolveResetMs(weekEnd))
     const id = setInterval(() => {
-      setRemaining(nextResetAt().getTime() - Date.now())
+      setRemaining(resolveResetMs(weekEnd))
     }, 1000)
     return () => {
       clearInterval(id)
     }
-  }, [])
+  }, [weekEnd])
 
   return (
     <span
-      className="font-mono text-sm tabular-nums text-panteon-fg"
+      className="font-mono text-[13px] tabular-nums text-panteon-fg"
       aria-label="Time until weekly reset"
     >
-      {formatRemaining(remaining)}
+      {compact ? formatRemainingCompact(remaining) : formatRemaining(remaining)}
     </span>
   )
 }
