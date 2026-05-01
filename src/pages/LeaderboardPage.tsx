@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { clsx } from 'clsx'
+import type { ViewEntry } from '@/api/schemas'
 import { HeroBanner } from '@/components/HeroBanner'
 import { LeaderboardList } from '@/components/LeaderboardList'
 import { OwnRankCluster } from '@/components/OwnRankCluster'
@@ -8,6 +9,12 @@ import { StickySelfBar } from '@/components/StickySelfBar'
 import { UserPicker } from '@/components/UserPicker'
 import { useLeaderboardView } from '@/hooks/useLeaderboardView'
 import { useUserId } from '@/hooks/useUserId'
+
+// Module-scoped stable empty array so `data?.top.entries ?? []`
+// doesn't synthesise a new reference every render before the first
+// poll resolves — that would force LeaderboardList to remount its
+// memoised subtree on the very first data tick.
+const EMPTY_ENTRIES: ViewEntry[] = []
 
 export function LeaderboardPage(): React.ReactElement {
   const { userId, setUserId } = useUserId()
@@ -34,8 +41,19 @@ interface LeaderboardViewProps {
 function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): React.ReactElement {
   const { data, error, isLoading } = useLeaderboardView(userId)
   const meta = data?.meta
-  const entries = data?.top.entries ?? []
+  const entries = data?.top.entries ?? EMPTY_ENTRIES
   const me = data?.me ?? null
+
+  // Derived slices computed at the top so React Compiler can memoise
+  // them on `entries` identity. Inside an IIFE the compiler's static
+  // scope ends up murky and the slices end up fresh per render even
+  // when `entries` is stable (ADR-012).
+  const podiumShown = entries.length >= 3
+  const podiumEntries = podiumShown ? entries.slice(0, 3) : EMPTY_ENTRIES
+  const listEntries = podiumShown ? entries.slice(3) : entries
+  const rangeLabel = podiumShown
+    ? `Ranks 4–${entries.length.toString()}`
+    : `Ranks 1–${entries.length.toString()}`
 
   // Callback refs let the bar's effect re-bind when the target element
   // actually mounts (e.g. after the first poll resolves). A useRef object
@@ -94,26 +112,15 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
       )}
 
       <div className="mx-auto max-w-[1140px] px-3 pb-16 pt-6 md:px-6 md:pt-8">
-        {(() => {
-          const podiumShown = entries.length >= 3
-          const listEntries = podiumShown ? entries.slice(3) : entries
-          const rangeLabel = podiumShown
-            ? `Ranks 4–${entries.length.toString()}`
-            : `Ranks 1–${entries.length.toString()}`
-          return (
-            <>
-              {podiumShown && <Podium entries={entries.slice(0, 3)} selfUserId={userId} />}
-              <SectionHeader title="Top 100 · Global" rangeLabel={rangeLabel} accent="muted" />
-              <LeaderboardList
-                entries={listEntries}
-                selfUserId={userId}
-                loading={isLoading}
-                error={error}
-                selfRowRef={selfRowCb}
-              />
-            </>
-          )
-        })()}
+        {podiumShown && <Podium entries={podiumEntries} selfUserId={userId} />}
+        <SectionHeader title="Top 100 · Global" rangeLabel={rangeLabel} accent="muted" />
+        <LeaderboardList
+          entries={listEntries}
+          selfUserId={userId}
+          loading={isLoading}
+          error={error}
+          selfRowRef={selfRowCb}
+        />
 
         {me && me.rank > 100 && (
           <section
