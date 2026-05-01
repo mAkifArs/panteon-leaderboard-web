@@ -48,6 +48,17 @@ imperative methods, and the `.lb-row-in` animation
 class. `handleJump` simplifies to "scroll to the
 already-mounted target."
 
+The earlier click-gating of `OwnRankCluster` (mount only on
+"Jump to me") goes with this. That gate existed to hide a
+cluster that would otherwise sit orphaned underneath a
+paginated 20-row list. With the full top 100 rendered on
+first paint, the cluster lives at the natural bottom of the
+page where the user scrolls to anyway — no orphan effect, no
+confusion about "where are my surrounding players." The gate
+made the page _more_ confusing once pagination was gone:
+users at rank 500k saw the sticky bar with no cluster above
+it. Cluster is back to auto-mount when `me.rank > 100`.
+
 ## Consequences
 
 ### Positive

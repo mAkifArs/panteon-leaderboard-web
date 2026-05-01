@@ -135,18 +135,11 @@ describe('Leaderboard E2E', () => {
     cy.findByTestId('sticky-self-bar').should('have.attr', 'data-visible', 'false')
   })
 
-  it('outside top-100 player: cluster mounts on Jump click and shows 6 rows centered on self', () => {
+  it('outside top-100 player: cluster auto-mounts at the bottom with 6 rows centered on self', () => {
     stubSample()
     stubCurrent(250)
     visitAsSeeded('user_250')
     cy.wait('@current-user_250').its('response.body.me.rank').should('eq', 250)
-
-    // Cluster is gated behind the Jump button to avoid a confusing
-    // "data dropped here" effect under a still-paginated top 100.
-    cy.findByRole('region', { name: /around your rank #250/i }).should('not.exist')
-    cy.findByTestId('sticky-self-bar').should('be.visible')
-
-    cy.findByRole('button', { name: /jump to your rank/i }).click()
 
     cy.findByRole('region', { name: /around your rank #250/i })
       .should('be.visible')
@@ -156,6 +149,8 @@ describe('Leaderboard E2E', () => {
         cy.findByRole('row', { name: /^Rank 250:.*\(you\)$/ }).should('exist')
         cy.findByRole('row', { name: /^Rank 252:/ }).should('exist')
       })
+
+    cy.findByTestId('sticky-self-bar').should('be.visible')
   })
 
   it('polls every 5 seconds and reflects refreshed prize pool', () => {

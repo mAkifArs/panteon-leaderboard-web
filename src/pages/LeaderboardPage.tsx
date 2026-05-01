@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { clsx } from 'clsx'
 import { HeroBanner } from '@/components/HeroBanner'
 import { LeaderboardList } from '@/components/LeaderboardList'
@@ -39,25 +39,15 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
 
   // Callback refs let the bar's effect re-bind when the target element
   // actually mounts (e.g. after the first poll resolves). A useRef object
-  // is not reactive — useState + callback ref is. The mirrored ref alongside
-  // the state lets handleJump read the latest node synchronously after the
-  // cluster mounts on click, without waiting for a re-render closure.
+  // is not reactive — useState + callback ref is.
   const [clusterEl, setClusterEl] = useState<HTMLElement | null>(null)
-  const clusterRef = useRef<HTMLElement | null>(null)
   const [selfRowEl, setSelfRowEl] = useState<HTMLLIElement | null>(null)
   const clusterCb = useCallback((node: HTMLElement | null) => {
-    clusterRef.current = node
     setClusterEl(node)
   }, [])
   const selfRowCb = useCallback((node: HTMLLIElement | null) => {
     setSelfRowEl(node)
   }, [])
-
-  // Outside top 100, we wait for an explicit "Jump to me" before
-  // mounting the cluster. Auto-rendering it underneath a paginated
-  // top-100 list looked orphaned and confused users into thinking
-  // their data had loaded in the wrong place.
-  const [showCluster, setShowCluster] = useState(false)
 
   // Sticky bar tracks the cluster when the player is outside the top 100,
   // otherwise it tracks the player's own row inside the top-100 list. When
@@ -82,22 +72,10 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
 
   const handleJump = (): void => {
     if (!me) return
-    // Outside top 100: cluster is gated behind this click. Mount
-    // it, then double-rAF for commit + layout, then scroll. We
-    // read clusterRef (not state) so the second rAF sees the node
-    // synchronously after the callback ref fires on mount.
     if (me.rank > 100) {
-      setShowCluster(true)
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (clusterRef.current) scrollToEl(clusterRef.current)
-        })
-      })
+      if (clusterEl) scrollToEl(clusterEl)
       return
     }
-    // Inside top 100 (rank > 3 enforced by StickySelfBar): the
-    // self row is already mounted (full top-100 renders on first
-    // paint per ADR-015), so just scroll and pulse.
     if (!selfRowEl) return
     scrollToEl(selfRowEl)
     triggerPulse(selfRowEl)
@@ -137,7 +115,7 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
           )
         })()}
 
-        {me && me.rank > 100 && showCluster && (
+        {me && me.rank > 100 && (
           <section
             ref={clusterCb}
             aria-label={`Around your rank #${me.rank.toString()}`}
