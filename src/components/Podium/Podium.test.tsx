@@ -48,10 +48,9 @@ describe('Podium', () => {
     for (const article of screen.getAllByRole('article')) {
       expect(article.className).not.toMatch(/lb-medal-glow-/)
     }
-    expect(screen.queryAllByText(/^You$/)).toHaveLength(0)
   })
 
-  it('applies gold glow + (you) label + You pill when the viewer is rank 1', () => {
+  it('applies gold glow + (you) aria suffix when the viewer is rank 1', () => {
     render(<Podium entries={entries} selfUserId="user_1" />)
     const cards = screen.getAllByLabelText(/First place: Champ \(you\)/)
     expect(cards).toHaveLength(2)
@@ -59,7 +58,6 @@ describe('Podium', () => {
       expect(card.className).toMatch(/lb-medal-glow-gold/)
       expect(card.className).toMatch(/border-prize-gold/)
     }
-    expect(screen.getAllByText('You')).toHaveLength(2)
   })
 
   it('applies silver glow when the viewer is rank 2', () => {

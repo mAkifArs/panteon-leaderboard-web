@@ -131,11 +131,6 @@ export function PodiumCard({ entry, place, isSelf }: PodiumCardProps): React.Rea
         <span className={clsx('truncate font-semibold text-panteon-fg', usernameSize[place])}>
           {entry.username}
         </span>
-        {isSelf && (
-          <span className="rounded-sm bg-panteon-orange px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em] text-white">
-            You
-          </span>
-        )}
         <span className="inline-flex items-center justify-center gap-1 font-mono text-[11px] text-panteon-muted">
           <span aria-hidden="true">{flagFromCountry(entry.country)}</span>
           <span>{entry.country ?? '—'}</span>
