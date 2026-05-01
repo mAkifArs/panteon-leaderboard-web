@@ -120,35 +120,49 @@ describe('Leaderboard E2E', () => {
     cy.contains(/signed in as/i).should('contain.text', 'user_001')
   })
 
-  it('top-3 player (rank 1): podium present, sticky bar absent', () => {
+  it('top-3 player (rank 1): podium present, gold glow on self card, sticky bar absent', () => {
     stubSample()
     stubCurrent(1)
     visitAsSeeded('user_001')
     cy.wait('@current-user_001').its('response.body.me.rank').should('eq', 1)
 
     cy.findByRole('region', { name: /top 3 podium/i }).should('be.visible')
+    cy.findAllByLabelText(/First place: Player_001 \(you\)/).each((card) => {
+      cy.wrap(card).should('have.class', 'lb-medal-glow-gold')
+    })
     cy.contains(/around you/i).should('not.exist')
     cy.findByTestId('sticky-self-bar').should('not.exist')
   })
 
-  it('podium boundary (rank 3): in podium, sticky bar still hidden', () => {
+  it('podium boundary (rank 3): in podium, bronze glow on self card, sticky bar still hidden', () => {
     stubSample()
     stubCurrent(3)
     visitAsSeeded('user_003')
     cy.wait('@current-user_003').its('response.body.me.rank').should('eq', 3)
 
     cy.findByRole('region', { name: /top 3 podium/i }).should('be.visible')
+    cy.findAllByLabelText(/Third place: Player_003 \(you\)/).each((card) => {
+      cy.wrap(card).should('have.class', 'lb-medal-glow-bronze')
+    })
     cy.findByTestId('sticky-self-bar').should('not.exist')
     cy.contains(/around you/i).should('not.exist')
   })
 
-  it('list start (rank 4): just past the podium, sticky bar visible, no cluster', () => {
+  it('list start (rank 4): no podium card carries a medal glow, sticky bar visible, no cluster', () => {
     stubSample()
     stubCurrent(4)
     visitAsSeeded('user_004')
     cy.wait('@current-user_004').its('response.body.me.rank').should('eq', 4)
 
     cy.findByRole('row', { name: /^Rank 4:.*\(you\)$/ }).should('exist')
+    cy.findByRole('region', { name: /top 3 podium/i })
+      .find('article')
+      .each((card) => {
+        cy.wrap(card)
+          .should('not.have.class', 'lb-medal-glow-gold')
+          .and('not.have.class', 'lb-medal-glow-silver')
+          .and('not.have.class', 'lb-medal-glow-bronze')
+      })
     cy.findByTestId('sticky-self-bar').should('be.visible')
     cy.contains(/around you/i).should('not.exist')
   })
