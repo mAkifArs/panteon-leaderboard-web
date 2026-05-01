@@ -16,7 +16,6 @@ interface Entry {
   status: Status
   data: unknown
   error: Error | undefined
-  lastUpdatedAt: number | undefined
   inFlight: AbortController | undefined
   timer: ReturnType<typeof setTimeout> | undefined
   intervalMs: number
@@ -33,15 +32,24 @@ const EMPTY_SNAPSHOT: PollingState<never> = Object.freeze({
   data: undefined,
   error: undefined,
   isLoading: false,
-  lastUpdatedAt: undefined,
 })
 
+// Identity-stable: the snapshot wrapper's reference is preserved
+// across no-op ticks (same data ref, same error, same isLoading).
+// Without this guard `useSyncExternalStore` re-renders consumers
+// every tick even when the response was structurally identical —
+// breaking the React Compiler memoisation chain that ADR-012
+// relies on.
 function rebuildSnapshot(entry: Entry): void {
+  const isLoading = entry.status === 'loading'
+  const prev = entry.cachedSnapshot
+  if (prev.data === entry.data && prev.error === entry.error && prev.isLoading === isLoading) {
+    return
+  }
   entry.cachedSnapshot = {
     data: entry.data,
     error: entry.error,
-    isLoading: entry.status === 'loading',
-    lastUpdatedAt: entry.lastUpdatedAt,
+    isLoading,
   }
 }
 
@@ -71,7 +79,6 @@ function runTick(key: string): void {
       entry.data = data
       entry.error = undefined
       entry.status = 'success'
-      entry.lastUpdatedAt = Date.now()
       entry.inFlight = undefined
       notify(entry)
     },
@@ -112,7 +119,6 @@ export interface PollingState<T> {
   data: T | undefined
   error: Error | undefined
   isLoading: boolean
-  lastUpdatedAt: number | undefined
 }
 
 export function usePolling<T>(
@@ -134,7 +140,6 @@ export function usePolling<T>(
           status: 'idle',
           data: undefined,
           error: undefined,
-          lastUpdatedAt: undefined,
           inFlight: undefined,
           timer: undefined,
           intervalMs,
