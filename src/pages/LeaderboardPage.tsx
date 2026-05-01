@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { clsx } from 'clsx'
 import { HeroBanner } from '@/components/HeroBanner'
-import { LeaderboardList, type LeaderboardListHandle } from '@/components/LeaderboardList'
+import { LeaderboardList } from '@/components/LeaderboardList'
 import { OwnRankCluster } from '@/components/OwnRankCluster'
 import { Podium } from '@/components/Podium'
 import { StickySelfBar } from '@/components/StickySelfBar'
@@ -39,21 +39,25 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
 
   // Callback refs let the bar's effect re-bind when the target element
   // actually mounts (e.g. after the first poll resolves). A useRef object
-  // is not reactive — useState + callback ref is.
+  // is not reactive — useState + callback ref is. The mirrored ref alongside
+  // the state lets handleJump read the latest node synchronously after the
+  // cluster mounts on click, without waiting for a re-render closure.
   const [clusterEl, setClusterEl] = useState<HTMLElement | null>(null)
+  const clusterRef = useRef<HTMLElement | null>(null)
   const [selfRowEl, setSelfRowEl] = useState<HTMLLIElement | null>(null)
   const clusterCb = useCallback((node: HTMLElement | null) => {
+    clusterRef.current = node
     setClusterEl(node)
   }, [])
   const selfRowCb = useCallback((node: HTMLLIElement | null) => {
     setSelfRowEl(node)
   }, [])
 
-  // Imperative handle on the list lets handleJump expand the
-  // reveal window (ADR-013) before scrolling — without it,
-  // the self row may not be in the DOM when the player is in
-  // ranks ~21..100.
-  const listRef = useRef<LeaderboardListHandle>(null)
+  // Outside top 100, we wait for an explicit "Jump to me" before
+  // mounting the cluster. Auto-rendering it underneath a paginated
+  // top-100 list looked orphaned and confused users into thinking
+  // their data had loaded in the wrong place.
+  const [showCluster, setShowCluster] = useState(false)
 
   // Sticky bar tracks the cluster when the player is outside the top 100,
   // otherwise it tracks the player's own row inside the top-100 list. When
@@ -78,31 +82,25 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
 
   const handleJump = (): void => {
     if (!me) return
-    // Outside top 100: the cluster section sits below the list,
-    // so any reveal that fires mid-scroll grows the list and
-    // pushes the cluster down — leaving the user short of the
-    // target. Reveal the whole list up front so the cluster's
-    // final position is locked in before we compute the scroll
-    // target. Double rAF waits for layout after the reveal commit.
+    // Outside top 100: cluster is gated behind this click. Mount
+    // it, then double-rAF for commit + layout, then scroll. We
+    // read clusterRef (not state) so the second rAF sees the node
+    // synchronously after the callback ref fires on mount.
     if (me.rank > 100) {
-      listRef.current?.revealAll()
+      setShowCluster(true)
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          if (clusterEl) scrollToEl(clusterEl)
+          if (clusterRef.current) scrollToEl(clusterRef.current)
         })
       })
       return
     }
-    // Inside top 100 (rank > 3 enforced by StickySelfBar):
-    // make sure the row's reveal page is committed, wait one
-    // frame for the callback ref to update, then scroll + pulse.
-    listRef.current?.ensureRankVisible(me.rank)
-    requestAnimationFrame(() => {
-      const el = selfRowEl
-      if (!el) return
-      scrollToEl(el)
-      triggerPulse(el)
-    })
+    // Inside top 100 (rank > 3 enforced by StickySelfBar): the
+    // self row is already mounted (full top-100 renders on first
+    // paint per ADR-015), so just scroll and pulse.
+    if (!selfRowEl) return
+    scrollToEl(selfRowEl)
+    triggerPulse(selfRowEl)
   }
 
   return (
@@ -129,7 +127,6 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
               {podiumShown && <Podium entries={entries.slice(0, 3)} />}
               <SectionHeader title="Top 100 · Global" rangeLabel={rangeLabel} accent="muted" />
               <LeaderboardList
-                ref={listRef}
                 entries={listEntries}
                 selfUserId={userId}
                 loading={isLoading}
@@ -140,7 +137,7 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
           )
         })()}
 
-        {me && me.rank > 100 && (
+        {me && me.rank > 100 && showCluster && (
           <section
             ref={clusterCb}
             aria-label={`Around your rank #${me.rank.toString()}`}

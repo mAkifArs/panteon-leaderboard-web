@@ -1,9 +1,16 @@
 # ADR-013: Reveal-style scroll pagination for the Top-100 list
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-015](ADR-015-render-full-top-100-no-reveal-pagination.md) on 2026-05-01
 - **Date:** 2026-04-29
 - **Deciders:** Mehmet Akif Arslan
 - **Tags:** #frontend #ux #a11y #performance
+
+> **Superseded.** After click-gating the cluster (rank > 100
+> path), the reveal pagination became the next-heaviest UI on
+> screen instead of relieving cognitive load. The API ships
+> the full top 100 in one response; rendering all 97 list rows
+> on first paint is cheap with React Compiler memoization.
+> See ADR-015 for the full reasoning.
 
 ## Context
 

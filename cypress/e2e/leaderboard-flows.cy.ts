@@ -125,37 +125,28 @@ describe('Leaderboard E2E', () => {
       .should('be.visible')
       .and('have.attr', 'data-visible', 'true')
 
-    cy.findByRole('row', { name: /^Rank 50:.*\(you\)$/ }).should('not.exist')
+    // Self row is mounted from the start (full top-100 rendered per ADR-015).
+    cy.findByRole('row', { name: /^Rank 50:.*\(you\)$/ }).should('exist')
 
     cy.findByRole('button', { name: /jump to your rank/i }).click()
 
-    // Jump reveals the row; we then scroll it into view so the bar's
-    // scroll listener observes the intersection and fades the bar.
-    cy.findByRole('row', { name: /^Rank 50:.*\(you\)$/ })
-      .should('exist')
-      .scrollIntoView({ duration: 0 })
-
+    // After click, the row scrolls into view; the bar's scroll
+    // listener sees the intersection and fades the bar out.
     cy.findByTestId('sticky-self-bar').should('have.attr', 'data-visible', 'false')
   })
 
-  it('reveal pagination expands the list when the sentinel comes into view', () => {
-    stubSample()
-    stubCurrent(1)
-    visitAsSeeded('user_001')
-    cy.wait('@current-user_001')
-
-    cy.findByTestId('reveal-sentinel').should('contain.text', '21–40')
-
-    cy.findByTestId('reveal-sentinel').scrollIntoView({ duration: 0 })
-
-    cy.findByTestId('reveal-sentinel').should('contain.text', '41–60')
-  })
-
-  it('outside top-100 player: cluster shows 6 rows centered on self', () => {
+  it('outside top-100 player: cluster mounts on Jump click and shows 6 rows centered on self', () => {
     stubSample()
     stubCurrent(250)
     visitAsSeeded('user_250')
     cy.wait('@current-user_250').its('response.body.me.rank').should('eq', 250)
+
+    // Cluster is gated behind the Jump button to avoid a confusing
+    // "data dropped here" effect under a still-paginated top 100.
+    cy.findByRole('region', { name: /around your rank #250/i }).should('not.exist')
+    cy.findByTestId('sticky-self-bar').should('be.visible')
+
+    cy.findByRole('button', { name: /jump to your rank/i }).click()
 
     cy.findByRole('region', { name: /around your rank #250/i })
       .should('be.visible')
@@ -165,8 +156,6 @@ describe('Leaderboard E2E', () => {
         cy.findByRole('row', { name: /^Rank 250:.*\(you\)$/ }).should('exist')
         cy.findByRole('row', { name: /^Rank 252:/ }).should('exist')
       })
-
-    cy.findByTestId('sticky-self-bar').should('be.visible')
   })
 
   it('polls every 5 seconds and reflects refreshed prize pool', () => {
