@@ -11,38 +11,32 @@ import { usePolling, type PollingState } from './usePolling'
  * reference is preserved so React Compiler memoization can short
  * the render at the row, podium, cluster, and sticky-bar levels.
  *
- * The wrapper itself (PollingState) is also cached: when the
- * stabilized data, error, and isLoading all match the previously
- * returned wrapper, we hand back the same wrapper reference. Without
- * this guard, every poll tick would return a fresh `{ data, error,
- * isLoading }` object even on a no-op tick, causing every consumer
- * of the hook to re-run.
+ * Stabilisation runs *inside* `usePolling` so the snapshot wrapper
+ * `rebuildSnapshot` writes also keeps its reference across no-op
+ * ticks — without that, `useSyncExternalStore` re-emits a fresh
+ * wrapper every tick and this component re-runs even when the
+ * data tree is identical. We additionally cache the wrapper at
+ * this layer to absorb any case where data changes shape but the
+ * stabilised content reduces to the previous value.
  */
 export function useLeaderboardView(userId: string): PollingState<CurrentResponse> {
-  const raw = usePolling<CurrentResponse>(`leaderboard:current:${userId}`, (signal) =>
-    apiGet(`/leaderboard/current/${encodeURIComponent(userId)}`, CurrentResponseSchema, signal),
+  const raw = usePolling<CurrentResponse>(
+    `leaderboard:current:${userId}`,
+    (signal) =>
+      apiGet(`/leaderboard/current/${encodeURIComponent(userId)}`, CurrentResponseSchema, signal),
+    { stabilize: stabilizeCurrentResponse },
   )
-  const prevRef = useRef<CurrentResponse | undefined>(undefined)
+
   const cachedRef = useRef<PollingState<CurrentResponse> | undefined>(undefined)
-
-  let next: PollingState<CurrentResponse> = raw
-  if (raw.data) {
-    const stable = stabilizeCurrentResponse(prevRef.current, raw.data)
-    prevRef.current = stable
-    if (stable !== raw.data) {
-      next = { ...raw, data: stable }
-    }
-  }
-
   const cached = cachedRef.current
   if (
     cached !== undefined &&
-    cached.data === next.data &&
-    cached.error === next.error &&
-    cached.isLoading === next.isLoading
+    cached.data === raw.data &&
+    cached.error === raw.error &&
+    cached.isLoading === raw.isLoading
   ) {
     return cached
   }
-  cachedRef.current = next
-  return next
+  cachedRef.current = raw
+  return raw
 }

@@ -7,30 +7,45 @@ afterEach(() => {
 })
 
 describe('usePolling snapshot identity', () => {
-  it('preserves snapshot reference across no-op ticks', async () => {
+  it('preserves snapshot reference across no-op ticks when stabilize keeps data ref', async () => {
     const stableData = { value: 42 }
-    const fetcher = vi.fn(() => Promise.resolve(stableData))
+    // Each fetch returns a *new* object with the same content, mimicking
+    // zod's fresh-parse behaviour. The stabiliser collapses them to one ref.
+    const fetcher = vi.fn(() => Promise.resolve({ value: 42 }))
+    const stabilize = (prev: { value: number } | undefined, next: { value: number }) =>
+      prev && prev.value === next.value ? prev : next
 
-    const { result } = renderHook(() => usePolling('test:identity', fetcher, 30))
+    const { result } = renderHook(() =>
+      usePolling('test:identity', fetcher, { intervalMs: 30, stabilize }),
+    )
 
     await waitFor(() => {
-      expect(result.current.data).toBe(stableData)
+      expect(result.current.data).toBeDefined()
     })
     const firstSnapshot = result.current
+    expect(result.current.data).toEqual(stableData)
 
-    await waitFor(() => {
-      expect(fetcher).toHaveBeenCalledTimes(2)
-    })
+    await waitFor(
+      () => {
+        expect(fetcher.mock.calls.length).toBeGreaterThanOrEqual(3)
+      },
+      { timeout: 2000, interval: 20 },
+    )
 
-    // Same data + error + isLoading → same wrapper reference.
+    // Same stable data + error + isLoading → same wrapper reference.
     expect(result.current).toBe(firstSnapshot)
+    expect(result.current.data).toBe(firstSnapshot.data)
   })
 
-  it('emits a fresh snapshot when data identity changes', async () => {
+  it('emits a fresh snapshot when stabilised data changes', async () => {
     let counter = 0
     const fetcher = vi.fn(() => Promise.resolve({ value: counter++ }))
+    const stabilize = (prev: { value: number } | undefined, next: { value: number }) =>
+      prev && prev.value === next.value ? prev : next
 
-    const { result } = renderHook(() => usePolling('test:churn', fetcher, 30))
+    const { result } = renderHook(() =>
+      usePolling('test:churn', fetcher, { intervalMs: 30, stabilize }),
+    )
 
     await waitFor(() => {
       expect(result.current.data).toBeDefined()

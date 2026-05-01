@@ -20,6 +20,7 @@ interface Entry {
   timer: ReturnType<typeof setTimeout> | undefined
   intervalMs: number
   fetcher: (signal: AbortSignal) => Promise<unknown>
+  stabilize: ((prev: unknown, next: unknown) => unknown) | undefined
   subscribers: Set<() => void>
   mounts: number
   cachedSnapshot: PollingState<unknown>
@@ -76,7 +77,7 @@ function runTick(key: string): void {
   entry.fetcher(ac.signal).then(
     (data) => {
       if (ac.signal.aborted) return
-      entry.data = data
+      entry.data = entry.stabilize ? entry.stabilize(entry.data, data) : data
       entry.error = undefined
       entry.status = 'success'
       entry.inFlight = undefined
@@ -121,13 +122,29 @@ export interface PollingState<T> {
   isLoading: boolean
 }
 
+export interface UsePollingOptions<T> {
+  intervalMs?: number
+  /**
+   * Optional structural-equal stabiliser. Without it, every fetch
+   * resolves to a fresh object reference and `rebuildSnapshot`'s
+   * identity guard always fails — so every tick wakes every consumer
+   * even when the wire payload is unchanged. Pass a stabiliser
+   * (typically built on `lib/structural-equal.ts`) to keep the
+   * `data` reference stable across no-op ticks.
+   */
+  stabilize?: (prev: T | undefined, next: T) => T
+}
+
 export function usePolling<T>(
   key: string | null,
   fetcher: (signal: AbortSignal) => Promise<T>,
-  intervalMs = 5000,
+  options: UsePollingOptions<T> = {},
 ): PollingState<T> {
+  const { intervalMs = 5000, stabilize } = options
   const fetcherRef = useRef(fetcher)
   fetcherRef.current = fetcher
+  const stabilizeRef = useRef(stabilize)
+  stabilizeRef.current = stabilize
 
   const subscribe = useCallback(
     (cb: () => void) => {
@@ -144,6 +161,10 @@ export function usePolling<T>(
           timer: undefined,
           intervalMs,
           fetcher: (signal) => fetcherRef.current(signal),
+          stabilize: stabilizeRef.current
+            ? (prev, next) =>
+                (stabilizeRef.current as (p: T | undefined, n: T) => T)(prev as T | undefined, next as T)
+            : undefined,
           subscribers: new Set(),
           mounts: 0,
           cachedSnapshot: EMPTY_SNAPSHOT,
