@@ -9,7 +9,7 @@ interface UserPickerProps {
 }
 
 export function UserPicker({ onSelect }: UserPickerProps): React.ReactElement {
-  const { data, error, isLoading } = useSampleUsers(3)
+  const { data, error, isLoading } = useSampleUsers(5)
 
   return (
     <main className="flex-1">
