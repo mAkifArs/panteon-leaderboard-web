@@ -77,25 +77,6 @@ export function SiteHeader(): React.ReactElement {
               </li>
             </ul>
           </nav>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="#store"
-              className="inline-flex h-7 items-center rounded-lg bg-panteon-orange px-4 text-[15px] font-medium uppercase text-panteon-fg transition-colors hover:bg-panteon-orange-deep"
-            >
-              Store
-            </a>
-            <button
-              type="button"
-              aria-label="Switch language"
-              className="inline-flex h-7 items-center gap-1 rounded-[10px] border border-[#979797] px-4 text-[15px] font-medium uppercase text-panteon-fg transition-colors hover:border-panteon-orange hover:text-panteon-orange"
-            >
-              EN
-              <span aria-hidden="true" className="text-[10px]">
-                ▾
-              </span>
-            </button>
-          </div>
         </div>
       </div>
     </header>
