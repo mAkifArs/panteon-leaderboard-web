@@ -103,3 +103,53 @@
 .lb-spinner {
   animation: lb-spinner 0.8s linear infinite;
 }
+
+/* Medal-coloured glow used by PodiumCard when the viewer is the
+   medalist. Mirrors tailwind.config.ts prize.{gold,silver,bronze}. */
+@keyframes lb-medal-glow-gold {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(245, 179, 1, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(245, 179, 1, 0.7);
+  }
+}
+
+@keyframes lb-medal-glow-silver {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(192, 196, 201, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(192, 196, 201, 0.7);
+  }
+}
+
+@keyframes lb-medal-glow-bronze {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(196, 122, 61, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(196, 122, 61, 0.7);
+  }
+}
+
+.lb-medal-glow-gold {
+  animation: lb-medal-glow-gold 2.4s ease-in-out infinite;
+}
+.lb-medal-glow-silver {
+  animation: lb-medal-glow-silver 2.4s ease-in-out infinite;
+}
+.lb-medal-glow-bronze {
+  animation: lb-medal-glow-bronze 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-medal-glow-gold,
+  .lb-medal-glow-silver,
+  .lb-medal-glow-bronze {
+    animation: none;
+  }
+}

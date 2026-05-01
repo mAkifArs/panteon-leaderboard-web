@@ -102,7 +102,7 @@ function LeaderboardView({ userId, onSwitchPlayer }: LeaderboardViewProps): Reac
             : `Ranks 1–${entries.length.toString()}`
           return (
             <>
-              {podiumShown && <Podium entries={entries.slice(0, 3)} />}
+              {podiumShown && <Podium entries={entries.slice(0, 3)} selfUserId={userId} />}
               <SectionHeader title="Top 100 · Global" rangeLabel={rangeLabel} accent="muted" />
               <LeaderboardList
                 entries={listEntries}
