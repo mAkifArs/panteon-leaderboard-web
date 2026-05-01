@@ -11,7 +11,7 @@
  * single literals (no concat) so the arbitrary classes survive.
  */
 
-export const LIST_GRID = 'grid-cols-[32px_32px_1fr_auto] md:grid-cols-[48px_44px_1fr_auto_160px]'
+export const LIST_GRID = 'grid-cols-[56px_32px_1fr_auto] md:grid-cols-[80px_44px_1fr_auto_160px]'
 
 export const LIST_ROW_PADDING = 'px-3 py-2.5 md:px-4 md:py-3'
 

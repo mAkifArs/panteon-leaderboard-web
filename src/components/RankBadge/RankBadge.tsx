@@ -12,10 +12,10 @@ const sizeClassName: Record<NonNullable<RankBadgeProps['size']>, string> = {
   lg: 'h-12 w-12 text-base',
 }
 
-const numericWidthClassName: Record<NonNullable<RankBadgeProps['size']>, string> = {
-  sm: 'w-7 text-xs',
-  md: 'w-10 text-sm',
-  lg: 'w-12 text-base',
+const numericTextClassName: Record<NonNullable<RankBadgeProps['size']>, string> = {
+  sm: 'text-xs',
+  md: 'text-sm',
+  lg: 'text-base',
 }
 
 function toneClassName(rank: number): string {
@@ -23,6 +23,24 @@ function toneClassName(rank: number): string {
   if (rank === 2) return 'bg-prize-silver text-black'
   if (rank === 3) return 'bg-prize-bronze text-white'
   return 'bg-panteon-surface-2 text-panteon-fg'
+}
+
+// The circle badge can't widen, so very large ranks are compacted
+// (e.g. 1.0M) so the picker card layout doesn't blow out. The
+// numeric (in-list) variant prefers full digits with grouping
+// separators so adjacent ranks like 499,997 vs 499,998 stay
+// distinguishable in the cluster.
+function formatCircleRank(rank: number): string {
+  if (rank >= 1_000_000) return `${(rank / 1_000_000).toFixed(1)}M`
+  if (rank >= 10_000) return `${Math.floor(rank / 1_000).toString()}K`
+  return rank.toString()
+}
+
+const NUMBER = new Intl.NumberFormat('en-US')
+
+function formatNumericRank(rank: number): string {
+  if (rank >= 10_000) return NUMBER.format(rank)
+  return rank.toString().padStart(2, '0')
 }
 
 export function RankBadge({
@@ -35,11 +53,11 @@ export function RankBadge({
       <span
         aria-hidden="true"
         className={clsx(
-          'inline-block shrink-0 text-center font-mono font-medium tabular-nums text-panteon-muted',
-          numericWidthClassName[size],
+          'inline-block shrink-0 text-left font-mono font-medium tabular-nums text-panteon-muted',
+          numericTextClassName[size],
         )}
       >
-        {rank.toString().padStart(2, '0')}
+        {formatNumericRank(rank)}
       </span>
     )
   }
@@ -53,7 +71,7 @@ export function RankBadge({
         toneClassName(rank),
       )}
     >
-      {rank}
+      {formatCircleRank(rank)}
     </span>
   )
 }
