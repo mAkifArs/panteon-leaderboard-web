@@ -17,8 +17,13 @@ const META = {
 
 const COUNTRIES = ['US', 'TR', 'DE', 'BR', 'JP', 'GB', 'FR', 'KR', 'ES', 'NL']
 
+const TOTAL_PLAYERS = 100_000
+const LAST_RANK = TOTAL_PLAYERS
+
 function makeEntry(rank: number, overrides: Partial<Entry> = {}): Entry {
-  const score = String(1_000_000_000 - rank * 1_000_000)
+  // Score must be a positive digit string per the API's BigInt contract;
+  // monotonically decreasing with rank so the order is believable.
+  const score = String(Math.max(1000, 10_000_000_000 - rank * 1_000))
   return {
     rank,
     userId: `user_${rank.toString().padStart(3, '0')}`,
@@ -33,8 +38,14 @@ function topEntries(count = 100): Entry[] {
   return Array.from({ length: count }, (_, i) => makeEntry(i + 1))
 }
 
+// Slides the 6-row window when the player is near the very top
+// (rank 1..3) or very bottom (rank totalPlayers-1..totalPlayers) of
+// the ladder, so cluster.length is always 6 — matching CLAUDE.md
+// invariant 2.
 function clusterAround(rank: number): Entry[] {
-  const start = Math.max(1, rank - 3)
+  const idealStart = rank - 3
+  const maxStart = TOTAL_PLAYERS - 5
+  const start = Math.max(1, Math.min(idealStart, maxStart))
   return Array.from({ length: 6 }, (_, i) => makeEntry(start + i))
 }
 
@@ -44,7 +55,7 @@ function currentBody(rank: number, opts: { poolOverride?: string } = {}) {
     top: { count: 100, entries: topEntries() },
     me: {
       rank,
-      totalPlayers: 100_000,
+      totalPlayers: TOTAL_PLAYERS,
       cluster: clusterAround(rank),
     },
   }
@@ -52,11 +63,16 @@ function currentBody(rank: number, opts: { poolOverride?: string } = {}) {
 
 const SAMPLE_USERS = {
   isoWeek: META.isoWeek,
-  count: 3,
+  count: 5,
+  // Edge tiers the player picker exposes for review: top of podium,
+  // last podium slot, mid pack, last in top 100, and the very bottom
+  // of the ladder. Each one drives a distinct render path.
   users: [
     makeEntry(1, { username: 'TopAce' }),
+    makeEntry(3, { username: 'PodiumLast' }),
     makeEntry(50, { username: 'MidTier' }),
-    makeEntry(250, { username: 'TailEnd' }),
+    makeEntry(100, { username: 'BorderLast' }),
+    makeEntry(LAST_RANK, { username: 'TailEnd' }),
   ],
 }
 
@@ -95,7 +111,7 @@ describe('Leaderboard E2E', () => {
     cy.wait('@sample')
 
     cy.findByRole('heading', { name: /pick a player/i }).should('be.visible')
-    cy.findAllByRole('button', { name: /continue as/i }).should('have.length', 3)
+    cy.findAllByRole('button', { name: /continue as/i }).should('have.length', 5)
 
     cy.findByRole('button', { name: /continue as topace/i }).click()
     cy.wait('@current-user_001').its('response.body.me.rank').should('eq', 1)
@@ -104,7 +120,7 @@ describe('Leaderboard E2E', () => {
     cy.contains(/signed in as/i).should('contain.text', 'user_001')
   })
 
-  it('top-3 player: podium present, sticky bar absent', () => {
+  it('top-3 player (rank 1): podium present, sticky bar absent', () => {
     stubSample()
     stubCurrent(1)
     visitAsSeeded('user_001')
@@ -113,6 +129,39 @@ describe('Leaderboard E2E', () => {
     cy.findByRole('region', { name: /top 3 podium/i }).should('be.visible')
     cy.contains(/around you/i).should('not.exist')
     cy.findByTestId('sticky-self-bar').should('not.exist')
+  })
+
+  it('podium boundary (rank 3): in podium, sticky bar still hidden', () => {
+    stubSample()
+    stubCurrent(3)
+    visitAsSeeded('user_003')
+    cy.wait('@current-user_003').its('response.body.me.rank').should('eq', 3)
+
+    cy.findByRole('region', { name: /top 3 podium/i }).should('be.visible')
+    cy.findByTestId('sticky-self-bar').should('not.exist')
+    cy.contains(/around you/i).should('not.exist')
+  })
+
+  it('list start (rank 4): just past the podium, sticky bar visible, no cluster', () => {
+    stubSample()
+    stubCurrent(4)
+    visitAsSeeded('user_004')
+    cy.wait('@current-user_004').its('response.body.me.rank').should('eq', 4)
+
+    cy.findByRole('row', { name: /^Rank 4:.*\(you\)$/ }).should('exist')
+    cy.findByTestId('sticky-self-bar').should('be.visible')
+    cy.contains(/around you/i).should('not.exist')
+  })
+
+  it('top-100 boundary (rank 100): last in list, sticky bar visible, no cluster', () => {
+    stubSample()
+    stubCurrent(100)
+    visitAsSeeded('user_100')
+    cy.wait('@current-user_100').its('response.body.me.rank').should('eq', 100)
+
+    cy.findByRole('row', { name: /^Rank 100:.*\(you\)$/ }).should('exist')
+    cy.findByTestId('sticky-self-bar').should('be.visible')
+    cy.contains(/around you/i).should('not.exist')
   })
 
   it('mid-tier player: sticky bar tracks self, jump scrolls and fades', () => {
@@ -148,6 +197,31 @@ describe('Leaderboard E2E', () => {
         cy.findByRole('row', { name: /^Rank 247:/ }).should('exist')
         cy.findByRole('row', { name: /^Rank 250:.*\(you\)$/ }).should('exist')
         cy.findByRole('row', { name: /^Rank 252:/ }).should('exist')
+      })
+
+    cy.findByTestId('sticky-self-bar').should('be.visible')
+  })
+
+  it('last player (rank totalPlayers): cluster slides up, self is last row of 6', () => {
+    stubSample()
+    stubCurrent(LAST_RANK)
+    const userId = `user_${LAST_RANK.toString()}`
+    visitAsSeeded(userId)
+    cy.wait(`@current-${userId}`).its('response.body.me.rank').should('eq', LAST_RANK)
+
+    cy.findByRole('region', {
+      name: new RegExp(`around your rank #${LAST_RANK.toString()}`, 'i'),
+    })
+      .should('be.visible')
+      .within(() => {
+        cy.findAllByRole('row').should('have.length', 6)
+        // Window slides up: top is rank-5, no rows below self.
+        cy.findByRole('row', { name: new RegExp(`^Rank ${(LAST_RANK - 5).toString()}:`) }).should(
+          'exist',
+        )
+        cy.findByRole('row', {
+          name: new RegExp(`^Rank ${LAST_RANK.toString()}:.*\\(you\\)$`),
+        }).should('exist')
       })
 
     cy.findByTestId('sticky-self-bar').should('be.visible')
