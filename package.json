@@ -39,7 +39,7 @@
     "@types/react-dom": "^19.0.2",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
-    "babel-plugin-react-compiler": "^19.0.0-beta-201e55d-20241215",
+    "babel-plugin-react-compiler": "^1.0.0",
     "cypress": "^13.17.0",
     "eslint": "^9.17.0",
     "eslint-plugin-cypress": "^4.1.0",
