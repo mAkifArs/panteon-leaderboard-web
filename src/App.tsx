@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary'
+import { OfflineIndicator } from '@/shared/components/OfflineIndicator'
 import { SiteFooter } from '@/shared/components/SiteFooter'
 import { SiteHeader } from '@/shared/components/SiteHeader'
 import { HomePage } from '@/pages/HomePage'
@@ -19,6 +20,7 @@ export function App(): React.ReactElement {
         </Routes>
       </ErrorBoundary>
       <SiteFooter />
+      <OfflineIndicator />
     </div>
   )
 }

@@ -28,6 +28,7 @@ interface Entry {
 
 const registry = new Map<string, Entry>()
 let visibilityListenerAttached = false
+let onlineListenerAttached = false
 
 const EMPTY_SNAPSHOT: PollingState<never> = Object.freeze({
   data: undefined,
@@ -65,6 +66,11 @@ function runTick(key: string): void {
   const entry = registry.get(key)
   if (!entry) return
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return
+  // Skip while offline (ADR-018). The browser would reject the fetch
+  // anyway; suppressing the request avoids 5s-cadence error noise in
+  // devtools and stops error state from flapping. The `online` event
+  // listener (`attachOnlineListener`) re-runs the tick on reconnect.
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return
 
   entry.inFlight?.abort()
   const ac = new AbortController()
@@ -116,6 +122,21 @@ function attachVisibilityListener(): void {
   })
 }
 
+function attachOnlineListener(): void {
+  if (onlineListenerAttached) return
+  if (typeof window === 'undefined') return
+  onlineListenerAttached = true
+  // Symmetric to the visibility handler (ADR-003 / ADR-018):
+  // when the browser regains connectivity, refetch every active
+  // key immediately so the user does not wait up to `intervalMs`
+  // for stale data to clear.
+  window.addEventListener('online', () => {
+    registry.forEach((_, key) => {
+      runTick(key)
+    })
+  })
+}
+
 export interface PollingState<T> {
   data: T | undefined
   error: Error | undefined
@@ -150,6 +171,7 @@ export function usePolling<T>(
     (cb: () => void) => {
       if (!key) return () => undefined
       attachVisibilityListener()
+      attachOnlineListener()
 
       let entry = registry.get(key)
       if (!entry) {
