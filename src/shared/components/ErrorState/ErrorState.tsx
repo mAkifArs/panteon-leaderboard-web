@@ -13,8 +13,8 @@ interface ErrorStateProps {
 }
 
 const VARIANT_CLASS: Record<NonNullable<ErrorStateProps['variant']>, string> = {
-  default: 'rounded-xl border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300',
-  compact: 'text-sm text-red-300',
+  default: 'rounded-xl border border-error-border bg-error-bg p-4 text-sm text-error-text',
+  compact: 'text-sm text-error-text',
 }
 
 export function ErrorState({

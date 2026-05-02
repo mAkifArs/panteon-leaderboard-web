@@ -51,6 +51,14 @@ export default {
             bg: '#0a0a0a',
           },
         },
+        // Semantic token for inline error UI (`ErrorState`). Values
+        // intentionally match the previous hardcoded red-300 / red-900/60
+        // / red-950/30 — same pixels, named meaning.
+        error: {
+          bg: 'rgba(69, 10, 10, 0.3)',
+          border: 'rgba(127, 29, 29, 0.6)',
+          text: '#fca5a5',
+        },
       },
       screens: {
         md: '720px',
