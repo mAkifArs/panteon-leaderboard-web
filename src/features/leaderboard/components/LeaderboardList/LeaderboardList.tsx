@@ -1,4 +1,5 @@
 import type { ViewEntry } from '@/shared/api/schemas'
+import { ErrorState } from '@/shared/components/ErrorState'
 import { LeaderboardRow } from '@/features/leaderboard/components/LeaderboardRow'
 import { ColumnHeader } from './ColumnHeader'
 
@@ -18,7 +19,8 @@ export function LeaderboardList({
   selfRowRef,
 }: LeaderboardListProps): React.ReactElement {
   if (loading && entries.length === 0) return <SkeletonList />
-  if (error && entries.length === 0) return <ErrorState message={error.message} />
+  if (error && entries.length === 0)
+    return <ErrorState>Failed to load leaderboard: {error.message}</ErrorState>
   if (entries.length === 0) {
     return (
       <p className="rounded-xl border border-panteon-border bg-panteon-surface-3 p-6 text-sm text-panteon-muted">
@@ -68,13 +70,3 @@ function SkeletonList(): React.ReactElement {
   )
 }
 
-function ErrorState({ message }: { message: string }): React.ReactElement {
-  return (
-    <div
-      role="alert"
-      className="rounded-xl border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300"
-    >
-      Failed to load leaderboard: {message}
-    </div>
-  )
-}

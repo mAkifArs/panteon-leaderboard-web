@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { ViewEntry } from '@/shared/api/schemas'
+import { ErrorState } from '@/shared/components/ErrorState'
 import { RankBadge } from '@/features/leaderboard/components/RankBadge'
 import { useSampleUsers } from '@/features/leaderboard/hooks/useSampleUsers'
 import { formatScore } from '@/shared/lib/format'
@@ -29,7 +30,12 @@ export function UserPicker({ onSelect }: UserPickerProps): React.ReactElement {
         </header>
 
         {isLoading && <SampleSkeletons />}
-        {error && <SampleError message={error.message} />}
+        {error && (
+          <ErrorState>
+            Couldn&apos;t load sample players: {error.message}. You can still enter a player ID
+            below.
+          </ErrorState>
+        )}
         {data && data.users.length > 0 && <SampleGrid users={data.users} onSelect={onSelect} />}
         {data && data.users.length === 0 && (
           <p className="rounded-xl border border-panteon-border bg-panteon-surface p-6 text-sm text-panteon-muted">
@@ -105,17 +111,6 @@ function SampleSkeletons(): React.ReactElement {
         />
       ))}
     </ul>
-  )
-}
-
-function SampleError({ message }: { message: string }): React.ReactElement {
-  return (
-    <div
-      role="alert"
-      className="rounded-2xl border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300"
-    >
-      Couldn&apos;t load sample players: {message}. You can still enter a player ID below.
-    </div>
   )
 }
 

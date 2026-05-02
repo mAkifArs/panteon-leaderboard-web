@@ -1,4 +1,5 @@
 import type { OwnRankPayload } from '@/shared/api/schemas'
+import { ErrorState } from '@/shared/components/ErrorState'
 import { LeaderboardRow } from '@/features/leaderboard/components/LeaderboardRow'
 
 interface OwnRankClusterProps {
@@ -23,8 +24,8 @@ export function OwnRankCluster({
 
   if (error && me === null) {
     return (
-      <div className={`${containerClass} p-4`} role="alert">
-        <p className="text-sm text-red-300">Failed to load: {error.message}</p>
+      <div className={`${containerClass} p-4`}>
+        <ErrorState variant="compact">Failed to load: {error.message}</ErrorState>
       </div>
     )
   }
