@@ -8,7 +8,7 @@ import { Podium } from '@/features/leaderboard/components/Podium'
 import { StickySelfBar } from '@/features/leaderboard/components/StickySelfBar'
 import { UserPicker } from '@/features/leaderboard/components/UserPicker'
 import { useLeaderboardView } from '@/features/leaderboard/hooks/useLeaderboardView'
-import { useUserId } from '@/features/leaderboard/hooks/useUserId'
+import { useUserId } from '@/shared/hooks/useUserId'
 
 // Module-scoped stable empty array so `data?.top.entries ?? []`
 // doesn't synthesise a new reference every render before the first
