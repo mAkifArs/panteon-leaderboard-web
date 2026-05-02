@@ -283,4 +283,95 @@ describe('Leaderboard E2E', () => {
     cy.findByRole('heading', { name: /pick a player/i }).should('be.visible')
     cy.location('search').should('not.contain', 'userId')
   })
+
+  it('renders the self row score via Intl.NumberFormat (invariant 1, no client math)', () => {
+    stubSample()
+    stubCurrent(50)
+    visitAsSeeded('user_050')
+    cy.wait('@current-user_050')
+
+    // Score "9999950000" arrives as a string from the API and is
+    // grouped by `formatScore` (Intl.NumberFormat 'en-US'). The
+    // a11y-label embeds the same formatted output, so asserting on
+    // the row's accessible name covers both render paths.
+    cy.findByRole('row', {
+      name: /^Rank 50: Player_050, score 9,999,950,000 \(you\)$/,
+    }).should('exist')
+  })
+
+  it('pauses polling while the tab is hidden and refetches on return (ADR-003)', () => {
+    let count = 0
+    cy.intercept({ method: 'GET', url: /\/users\/sample(\?|$)/ }, { body: SAMPLE_USERS })
+    cy.intercept({ method: 'GET', url: /\/leaderboard\/current\/user_050(\?|$)/ }, (req) => {
+      count++
+      req.reply({ body: currentBody(50) })
+    }).as('current')
+
+    cy.clock(Date.now(), ['setTimeout', 'clearTimeout', 'Date'])
+    visitAsSeeded('user_050')
+
+    cy.wait('@current')
+    cy.then(() => {
+      expect(count).to.eq(1)
+    })
+
+    // Hidden: scheduled ticks fire but `runTick` early-returns.
+    cy.document().then((doc) => {
+      Object.defineProperty(doc, 'visibilityState', { configurable: true, get: () => 'hidden' })
+      doc.dispatchEvent(new Event('visibilitychange'))
+    })
+    cy.tick(15_000)
+    cy.then(() => {
+      expect(count, 'no fetches while hidden').to.eq(1)
+    })
+
+    // Visible: the visibilitychange listener fires an immediate refetch.
+    cy.document().then((doc) => {
+      Object.defineProperty(doc, 'visibilityState', { configurable: true, get: () => 'visible' })
+      doc.dispatchEvent(new Event('visibilitychange'))
+    })
+    cy.wait('@current')
+    cy.then(() => {
+      expect(count, 'immediate refetch on visible').to.be.gte(2)
+    })
+  })
+
+  it('a11y: picker cards are real <button> elements that take focus', () => {
+    stubSample()
+    stubCurrent(1)
+    cy.visit('/leaderboard')
+    cy.wait('@sample')
+
+    // Invariant 5: every interactive element is a real button or link.
+    // Tag + type guard catches any future `<div onClick>` regression.
+    cy.findByRole('button', { name: /continue as topace/i })
+      .should(($btn) => {
+        expect($btn.prop('tagName')).to.eq('BUTTON')
+        expect($btn.prop('type')).to.eq('button')
+      })
+      .focus()
+      .should('have.focus')
+
+    // The same handler Enter/Space invokes when the button is focused.
+    // Pure keyboard activation needs cypress-real-events, which we
+    // don't ship; clicking the focused element exercises the same path.
+    cy.focused().click()
+
+    cy.wait('@current-user_001').its('response.body.me.rank').should('eq', 1)
+    cy.findByRole('heading', { name: /weekly/i }).should('be.visible')
+  })
+
+  it('home route renders without picker; unknown route shows the 404 page', () => {
+    cy.visit('/')
+    cy.findByRole('heading', { name: /^weekly leaderboard$/i }).should('be.visible')
+    cy.findByRole('heading', { name: /pick a player/i }).should('not.exist')
+    cy.findByRole('link', { name: /view live demo/i }).should(
+      'have.attr',
+      'href',
+      '/leaderboard',
+    )
+
+    cy.visit('/some-route-that-does-not-exist', { failOnStatusCode: false })
+    cy.findByRole('heading', { name: /page not found/i }).should('be.visible')
+  })
 })
