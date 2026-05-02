@@ -15,7 +15,7 @@
  * compare them, never do arithmetic.
  */
 
-import type { CurrentResponse, Meta, OwnRankPayload, ViewEntry } from '@/shared/api/schemas'
+import type { CurrentResponse, Meta, OwnRankPayload, ViewEntry } from './schemas'
 
 export function stabilizeViewEntry(prev: ViewEntry | undefined, next: ViewEntry): ViewEntry {
   if (!prev) return next

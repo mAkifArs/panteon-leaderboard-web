@@ -5,7 +5,7 @@ import {
   stabilizeOwnRankPayload,
   stabilizeViewEntry,
 } from './structural-equal'
-import type { CurrentResponse, Meta, OwnRankPayload, ViewEntry } from '@/shared/api/schemas'
+import type { CurrentResponse, Meta, OwnRankPayload, ViewEntry } from './schemas'
 
 function makeEntry(overrides: Partial<ViewEntry> = {}): ViewEntry {
   return {

@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { apiGet } from '@/shared/api/client'
 import { CurrentResponseSchema, type CurrentResponse } from '@/shared/api/schemas'
-import { stabilizeCurrentResponse } from '@/shared/lib/structural-equal'
+import { stabilizeCurrentResponse } from '@/shared/api/structural-equal'
 import { usePolling, type PollingState } from '@/shared/hooks/usePolling'
 
 /**
