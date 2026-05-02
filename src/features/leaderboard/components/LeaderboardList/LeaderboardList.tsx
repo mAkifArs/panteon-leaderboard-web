@@ -1,5 +1,6 @@
 import type { ViewEntry } from '@/shared/api/schemas'
 import { ErrorState } from '@/shared/components/ErrorState'
+import { SkeletonRow } from '@/shared/components/Skeleton'
 import { LeaderboardRow } from '@/features/leaderboard/components/LeaderboardRow'
 import { ColumnHeader } from './ColumnHeader'
 
@@ -60,12 +61,7 @@ function SkeletonList(): React.ReactElement {
       aria-busy="true"
       aria-live="polite"
     >
-      {Array.from({ length: 8 }).map((_, i) => (
-        <li
-          key={`skel-${i.toString()}`}
-          className="h-12 animate-pulse-soft border-t border-panteon-border bg-panteon-surface-2/30"
-        />
-      ))}
+      <SkeletonRow count={8} />
     </ol>
   )
 }
