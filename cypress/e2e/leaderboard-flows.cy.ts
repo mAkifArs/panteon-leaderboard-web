@@ -374,4 +374,38 @@ describe('Leaderboard E2E', () => {
     cy.visit('/some-route-that-does-not-exist', { failOnStatusCode: false })
     cy.findByRole('heading', { name: /page not found/i }).should('be.visible')
   })
+
+  it('offline indicator: hidden while online, mounts on offline event, dismisses popover on reconnect', () => {
+    stubSample()
+    stubCurrent(50)
+    visitAsSeeded('user_050')
+    cy.wait('@current-user_050')
+
+    // Online by default — no indicator in the DOM.
+    cy.findByRole('button', { name: /you are offline/i }).should('not.exist')
+
+    // Flip navigator.onLine + dispatch the event the indicator listens to.
+    cy.window().then((win) => {
+      Object.defineProperty(win.navigator, 'onLine', { configurable: true, get: () => false })
+      win.dispatchEvent(new Event('offline'))
+    })
+    cy.findByRole('button', { name: /you are offline/i }).should('be.visible').click()
+    cy.findByRole('alert').should('contain.text', 'You are offline')
+
+    // Coming back online unmounts the indicator and the popover with it.
+    cy.window().then((win) => {
+      Object.defineProperty(win.navigator, 'onLine', { configurable: true, get: () => true })
+      win.dispatchEvent(new Event('online'))
+    })
+    cy.findByRole('button', { name: /you are offline/i }).should('not.exist')
+    cy.findByRole('alert').should('not.exist')
+  })
+
+  it('error boundary: ?force_error=throw triggers the App-level fallback (sentinel)', () => {
+    cy.visit('/leaderboard?force_error=throw', { failOnStatusCode: false })
+    // AppErrorFallback claims the route region; chrome (header/footer)
+    // stays mounted because the boundary wraps only <Routes>.
+    cy.findByRole('heading', { name: /something went wrong/i }).should('be.visible')
+    cy.findByRole('button', { name: /try again/i }).should('be.visible')
+  })
 })

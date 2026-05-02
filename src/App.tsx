@@ -13,16 +13,37 @@ export function App(): React.ReactElement {
       <ErrorBoundary
         fallback={(error, reset) => <AppErrorFallback error={error} reset={reset} />}
       >
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ForceErrorGate>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ForceErrorGate>
       </ErrorBoundary>
       <SiteFooter />
       <OfflineIndicator />
     </div>
   )
+}
+
+/**
+ * Test-only sentinel: visiting any route with `?force_error=throw`
+ * raises a render exception so the app-level ErrorBoundary integration
+ * (ADR-017) can be smoke-tested end-to-end in Cypress. The cost is one
+ * `URLSearchParams.get` per render on a string compare; the only way a
+ * real user trips this is by typing the query into the URL bar
+ * themselves, in which case they get the boundary fallback that the
+ * gate is designed to surface.
+ */
+function ForceErrorGate({ children }: { children: React.ReactNode }): React.ReactNode {
+  if (typeof window !== 'undefined') {
+    const force = new URLSearchParams(window.location.search).get('force_error')
+    if (force === 'throw') {
+      throw new Error('Forced error for boundary smoke test')
+    }
+  }
+  return children
 }
 
 function NotFound(): React.ReactElement {

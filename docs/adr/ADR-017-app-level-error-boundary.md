@@ -77,11 +77,16 @@ non-hook component in an otherwise hooks-only codebase.
 - Does not affect API error paths. `useLeaderboardView`'s
   `error` state still surfaces network failures through its
   consumers — the boundary only kicks in for render exceptions.
-- Cypress E2E does not exercise the boundary. Production
-  components don't intentionally throw, so a Cypress test would
-  need a synthetic throwing route, which is more harness than
-  signal. Vitest unit test (3 cases: passthrough, catch-and-render,
-  reset-and-recover) covers the contract.
+- Cypress smoke test (added 2026-05-03): a small
+  `ForceErrorGate` reads `?force_error=throw` from the URL and
+  throws on render, so Cypress can hit `/leaderboard?force_error=throw`
+  and assert that `AppErrorFallback` claims the route region while
+  header/footer stay mounted. This was originally rejected as
+  "more harness than signal" but the gate is a 6-line render-time
+  query check — cheap enough that the e2e proof of "boundary is
+  actually wired in App.tsx, not just unit-tested in isolation"
+  earns its keep. The unit suite (3 cases: passthrough,
+  catch-and-render, reset-and-recover) still owns the contract.
 
 ## Alternatives Considered
 

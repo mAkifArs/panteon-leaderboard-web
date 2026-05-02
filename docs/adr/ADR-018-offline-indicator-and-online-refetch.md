@@ -99,9 +99,14 @@ chrome via `z-50`.
   benefit from the same indicator without changes.
 - Vitest covers six cases: no-render-when-online, render-when-
   offline, popover toggle, online/offline event reactivity, popover
-  collapse on reconnect, outside-click dismissal. No Cypress —
-  controlling `navigator.onLine` from Cypress is brittle and the
-  unit contract is clear.
+  collapse on reconnect, outside-click dismissal. Cypress smoke
+  test (added 2026-05-03) walks the same online → offline →
+  popover-click → online cycle by overriding `navigator.onLine`
+  via `Object.defineProperty` on `cy.window()` and dispatching the
+  `offline`/`online` events; less brittle in practice than the
+  initial caveat suggested. Unit owns the contract; e2e owns the
+  proof that the indicator is mounted at App level and reacts in
+  a real browser.
 
 ## Alternatives Considered
 
