@@ -1,8 +1,8 @@
 import { Route, Routes } from 'react-router-dom'
 import { SiteFooter } from '@/shared/components/SiteFooter'
 import { SiteHeader } from '@/shared/components/SiteHeader'
-import { HomePage } from '@/features/home/pages/HomePage'
-import { LeaderboardPage } from '@/features/leaderboard/pages/LeaderboardPage'
+import { HomePage } from '@/pages/HomePage'
+import { LeaderboardPage } from '@/pages/LeaderboardPage'
 
 export function App(): React.ReactElement {
   return (

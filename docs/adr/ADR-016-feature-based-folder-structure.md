@@ -1,6 +1,6 @@
 # ADR-016: Feature-based folder structure
 
-- **Status:** Accepted
+- **Status:** Accepted (revised same-day — see Revision History)
 - **Date:** 2026-05-02
 - **Deciders:** Mehmet Akif Arslan
 - **Tags:** #frontend #architecture #refactor
@@ -39,19 +39,20 @@ The flat layout was the right starting shape. It is no longer.
 
 ## Decision
 
-Reorganize `src/` into **features** and **shared**:
+Reorganize `src/` into three top-level concerns: **pages**,
+**features**, and **shared**:
 
 ```
 src/
-  features/
+  pages/                  # thin route entries — one file per route
+    HomePage.tsx
+    LeaderboardPage.tsx
+  features/               # implementation modules (multi-file domains)
     leaderboard/
       components/
       hooks/
       lib/
-      pages/
-    home/
-      pages/
-  shared/
+  shared/                 # cross-feature primitives
     api/
     components/
     hooks/
@@ -62,6 +63,23 @@ src/
   vite-env.d.ts
 ```
 
+The split is by **role**, not by domain:
+
+- **`pages/`** is for route entries. A page composes feature
+  modules and wires them into a route; it owns no implementation
+  detail of its own beyond a bit of layout glue. `HomePage` is a
+  static panteon.games clone; `LeaderboardPage` composes
+  `UserPicker`, `HeroBanner`, `Podium`, `LeaderboardList`,
+  `OwnRankCluster`, `StickySelfBar`. Both are route-level
+  concerns, both live in `pages/`.
+- **`features/<name>/`** is for an implementation module — a
+  domain that has multiple parts (components, hooks, lib).
+  Keeping pages out of `features/` means a feature folder
+  contains only the parts a page (or another feature) imports;
+  the route entry is one level up where `App.tsx` can find it.
+- **`shared/`** is for primitives used across features (or
+  designed to be).
+
 A module belongs in `shared/` when it is **already used by more
 than one feature** *or* when it is a primitive whose purpose is
 feature-agnostic (e.g. `usePolling` — only one caller today, but
@@ -71,6 +89,7 @@ caller appears; demotion is the same.
 
 Concrete classification:
 
+- **`pages/`**: `HomePage`, `LeaderboardPage`.
 - **`shared/components/`**: `Avatar`, `SiteHeader`, `SiteFooter`.
   Avatar is used by `LeaderboardRow`, `PodiumCard`, `StickySelfBar`
   — already cross-component within leaderboard, and obviously
@@ -89,9 +108,7 @@ Concrete classification:
   `OwnRankCluster`, `Podium`, `StickySelfBar`, `RankBadge`,
   `HeroBanner`, `CountdownToReset`, `LivePulse`, `PrizePoolInfo`,
   `StatCard`, `UserPicker`, plus `useLeaderboardView`,
-  `useSampleUsers`, `useUserId`, `iso-week`, and `LeaderboardPage`.
-- **`features/home/`**: `HomePage`. One file today; the boundary
-  is what matters, not the size.
+  `useSampleUsers`, `useUserId`, and `iso-week`.
 
 Path alias `@/` (vite.config.ts:17-21, tsconfig.app.json:27-29) is
 preserved. Only the right-hand side of imports changes — for
@@ -157,13 +174,40 @@ Pulls leaderboard-only primitives out of the leaderboard. The rule
 unit. `RankBadge` is used by three leaderboard parts but no other
 feature; it stays in `features/leaderboard/components/`. Rejected.
 
+### Alternative D: Pages live inside their feature
+(`features/leaderboard/pages/LeaderboardPage.tsx`,
+`features/home/pages/HomePage.tsx`)
+
+The first cut of this ADR took this shape, on a "boundary, not size"
+argument. It collapsed under its own weight: `features/home/` had
+exactly one file, three folders deep, with no other home parts to
+keep it company. A folder whose only purpose is to hold one file is
+scaffolding, not a feature. Worse, it forced an asymmetry where a
+"feature" could mean either a multi-part implementation module
+(leaderboard) or a single page (home). Rejected — pages live in
+`pages/`, features are the implementation modules they compose.
+
+## Revision History
+
+- **2026-05-02 (initial):** Pages lived inside their feature
+  folder (`features/leaderboard/pages/`, `features/home/pages/`).
+  Argued from "tutarlılık" — every page in the same shape.
+- **2026-05-02 (same-day revision):** Moved pages out to
+  `src/pages/`. The single-file `features/home/` was the visible
+  failure mode — a feature folder with one page in it is just a
+  page in disguise. Pages are route-entry concerns, separate
+  from feature implementations. The `pages/feature/shared` split
+  recorded above is the durable shape.
+
 ## AI involvement
 
 Claude proposed the reorg during a post-redesign review and mapped
 the import dependencies before any code moved (no relative imports,
-all `@/` aliases — clean string-replace path). The boundary calls
-(Avatar shared, RankBadge leaderboard, useUserId leaderboard, home
-as its own feature) were discussed turn-by-turn. Decision is mine.
+all `@/` aliases — clean string-replace path). The first cut put
+pages inside their feature folders; the user pushed back on
+`features/home/` as a one-file folder with no obvious mantığı, and
+on review the page-as-feature-content idea didn't survive. Same-day
+revision moved pages out. Decision is mine.
 
 ## References
 
