@@ -1,4 +1,5 @@
 import { useCallback, useRef, useSyncExternalStore } from 'react'
+import { ApiError } from '@/shared/api/client'
 
 /**
  * Module-scoped polling registry (ADR-004).
@@ -19,6 +20,13 @@ interface Entry {
   inFlight: AbortController | undefined
   timer: ReturnType<typeof setTimeout> | undefined
   intervalMs: number
+  /**
+   * One-shot override for the next scheduled tick — used when a
+   * fetch fails with 429 and the server supplied `Retry-After`.
+   * Consumed by `schedule` and reset back to undefined immediately,
+   * so subsequent ticks fall back to `intervalMs`.
+   */
+  nextDelayMs: number | undefined
   fetcher: (signal: AbortSignal) => Promise<unknown>
   stabilize: ((prev: unknown, next: unknown) => unknown) | undefined
   subscribers: Set<() => void>
@@ -95,6 +103,21 @@ function runTick(key: string): void {
       entry.error = err instanceof Error ? err : new Error(String(err))
       entry.status = 'error'
       entry.inFlight = undefined
+      // 429 + Retry-After: the server told us when to come back.
+      // Push the next scheduled tick out by that amount, but never
+      // shorter than our normal interval — Retry-After can be sub-
+      // second and we shouldn't poll faster than intended.
+      // Reschedule so the override actually replaces the timer that
+      // the outer `schedule` call (synchronous after `runTick`)
+      // already set with the default interval.
+      if (
+        err instanceof ApiError &&
+        err.status === 429 &&
+        err.retryAfterSec !== undefined
+      ) {
+        entry.nextDelayMs = Math.max(err.retryAfterSec * 1000, entry.intervalMs)
+        schedule(key)
+      }
       notify(entry)
     },
   )
@@ -104,10 +127,12 @@ function schedule(key: string): void {
   const entry = registry.get(key)
   if (!entry) return
   if (entry.timer) clearTimeout(entry.timer)
+  const delay = entry.nextDelayMs ?? entry.intervalMs
+  entry.nextDelayMs = undefined
   entry.timer = setTimeout(() => {
     runTick(key)
     schedule(key)
-  }, entry.intervalMs)
+  }, delay)
 }
 
 function attachVisibilityListener(): void {
@@ -182,6 +207,7 @@ export function usePolling<T>(
           inFlight: undefined,
           timer: undefined,
           intervalMs,
+          nextDelayMs: undefined,
           fetcher: (signal) => fetcherRef.current(signal),
           stabilize: stabilizeRef.current
             ? (prev, next) =>

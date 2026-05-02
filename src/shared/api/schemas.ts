@@ -59,6 +59,25 @@ export const SampleUsersResponseSchema = z.object({
 })
 export type SampleUsersResponse = z.infer<typeof SampleUsersResponseSchema>
 
+/**
+ * Known error codes the backend emits (panteon-leaderboard-api ADR-010
+ * + the standard handler in `plugins/error-handler.ts`). The schema
+ * accepts unknown codes too — backend may add new ones without a
+ * frontend release — so callers should treat the type as "one of
+ * these we know how to react to, or a string we surface verbatim."
+ */
+export const KNOWN_API_ERROR_CODES = [
+  'invalid_query',
+  'invalid_params',
+  'unranked',
+  'not_found',
+  'internal_error',
+  'bad_request',
+  'rate_limited',
+] as const
+export type KnownApiErrorCode = (typeof KNOWN_API_ERROR_CODES)[number]
+export type ApiErrorCode = KnownApiErrorCode | (string & {})
+
 export const ApiErrorBodySchema = z.object({
   error: z.object({
     code: z.string(),

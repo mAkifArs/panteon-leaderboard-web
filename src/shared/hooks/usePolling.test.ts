@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { ApiError } from '@/shared/api/client'
 import { __resetPollingRegistry, usePolling } from './usePolling'
 
 afterEach(() => {
@@ -35,6 +36,34 @@ describe('usePolling snapshot identity', () => {
     // Same stable data + error + isLoading → same wrapper reference.
     expect(result.current).toBe(firstSnapshot)
     expect(result.current.data).toBe(firstSnapshot.data)
+  })
+
+  it('honours Retry-After on 429: pushes the next tick to retryAfterSec*1000', async () => {
+    const fetcher = vi.fn<() => Promise<{ value: number }>>()
+    fetcher.mockRejectedValueOnce(new ApiError(429, 'rate_limited', 'too many', 1))
+    fetcher.mockResolvedValue({ value: 1 })
+
+    renderHook(() => usePolling('test:429', fetcher, { intervalMs: 30 }))
+
+    // Initial tick fires and rejects with 429.
+    await waitFor(() => {
+      expect(fetcher).toHaveBeenCalledTimes(1)
+    })
+
+    // Normal interval (30 ms) elapses several times — but the
+    // server told us to wait 1 s, so no second call yet.
+    await new Promise((resolve) => setTimeout(resolve, 200))
+    expect(fetcher).toHaveBeenCalledTimes(1)
+
+    // After ~1 s the back-off expires and the next tick fires;
+    // the override is one-shot so subsequent ticks return to
+    // the normal cadence.
+    await waitFor(
+      () => {
+        expect(fetcher).toHaveBeenCalledTimes(2)
+      },
+      { timeout: 1500, interval: 30 },
+    )
   })
 
   it('emits a fresh snapshot when stabilised data changes', async () => {
