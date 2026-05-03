@@ -6,12 +6,52 @@ Weekly leaderboard SPA built for the Panteon case study. React 19 +
 Vite + TypeScript, polled against a separate Fastify API
 ([panteon-leaderboard-api](https://github.com/mAkifArs/panteon-leaderboard-api)).
 
-- **Live demo:** https://panteon-leaderboard-web.pages.dev/leaderboard
+- **Live demo:** https://panteon-leaderboard-web.pages.dev/leaderboard — see [How to test the live demo](#how-to-test-the-live-demo) for a 90-second guided tour
 - **API:** https://panteon-leaderboard-api.onrender.com
 
 The work is intentionally over-documented for the review — the
 **`docs/adr/`** folder is the project's memory. If you have ten
 minutes, that's where to spend them.
+
+## How to test the live demo
+
+A guided tour through everything worth showing — should take about
+90 seconds end-to-end. The live URL is the easiest entry point;
+nothing to install.
+
+1. Open the [live demo](https://panteon-leaderboard-web.pages.dev/leaderboard).
+   You land on the **player picker** — five sample accounts spanning
+   top, mid, and tail ranks, plus an intentional whale (`Player
+   #whale-li`) carrying `5e18` earnings to demo the BigInt rendering
+   path. Pick a **Top tier** card.
+2. You're now on the leaderboard with **your row highlighted**, the
+   **podium** for ranks 1–3 above the list, the **week countdown**
+   ticking, and a **prize pool** card explaining the 2 % / 20-15-10-55
+   split (hover the `i` icon).
+3. Click **Switch player** (top right of the hero) → pick a **Mid
+   pack** card. The "Around You" cluster slides — your row stays
+   centred, the 3-above / 2-below neighbours shift around it.
+4. **Scroll down past your row.** A **sticky self-bar** fades in at
+   the bottom; the jump arrow points **up (↑)** because your row is
+   now above the viewport. Click it — smooth scroll lands you back,
+   the bar fades out. Scroll back to the top before your row and the
+   arrow flips to **down (↓)**.
+5. **Resize to mobile** (or DevTools mobile mode, e.g. iPhone 14).
+   The desktop nav collapses into a **hamburger** — tap it for the
+   side drawer. Escape, backdrop click, or any link inside dismisses
+   it; focus returns to the trigger.
+6. Open the **network tab**. Polling fires every **5 s**. Hide the
+   tab (or run `document.dispatchEvent(new Event('visibilitychange'))`
+   after setting `document.visibilityState`) — polling pauses. Bring
+   the tab back — an immediate refetch fires.
+7. Hit **back / forward** in the browser after switching players.
+   URL state is the source of truth (`?userId=...`); history just
+   works, no in-memory player slot to corrupt.
+8. (Optional, code path) Read **ADR-016** then **ADR-014** then
+   **ADR-004** — that's the shortest path through the architectural
+   narrative. Polling-specific decisions live in **ADR-003** (why
+   polling, not WebSockets), **ADR-004** (the hook design), and
+   **ADR-012** (referential stability across no-op ticks).
 
 ## What you'll see
 
@@ -40,27 +80,6 @@ A weekly leaderboard for an idle/clicker game. Concretely:
 - **Error boundary** at the App level with a recover button, plus
   an **offline indicator** that pauses polling when the browser
   loses connectivity.
-
-## Suggested reviewer walkthrough
-
-1. Open the [live demo](https://panteon-leaderboard-web.pages.dev/leaderboard).
-   You land on the player picker — pick a **Top tier** card to see
-   the podium with your row highlighted.
-2. Switch to a **Mid pack** player via the "Switch player" link
-   (top right). Notice the cluster slides — your row stays centred,
-   the neighbours shift.
-3. Scroll past your row. The **sticky self-bar** appears at the
-   bottom; the jump arrow points back up (↑). Click it — smooth
-   scroll lands you back on your row, the bar fades.
-4. Resize to mobile (or DevTools mobile mode). The desktop nav is
-   replaced by a hamburger; tap it for the side drawer.
-5. Open the network tab. Polling fires every **5 s**. Hide the tab
-   (or `document.visibilityState = 'hidden'` in the console) — polling
-   pauses. Bring the tab back — an immediate refetch fires.
-6. Hit the back/forward buttons after switching players. URL state
-   is the source of truth (`?userId=...`), so history works.
-7. Read **ADR-016** then **ADR-014** then **ADR-004** — that's the
-   shortest path through the architectural narrative.
 
 ## Quick start
 
