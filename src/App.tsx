@@ -3,10 +3,12 @@ import { ErrorBoundary } from '@/shared/components/ErrorBoundary'
 import { OfflineIndicator } from '@/shared/components/OfflineIndicator'
 import { SiteFooter } from '@/shared/components/SiteFooter'
 import { SiteHeader } from '@/shared/components/SiteHeader'
+import { useScrollToHash } from '@/shared/hooks/useScrollToHash'
 import { HomePage } from '@/pages/HomePage'
 import { LeaderboardPage } from '@/pages/LeaderboardPage'
 
 export function App(): React.ReactElement {
+  useScrollToHash()
   return (
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />

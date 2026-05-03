@@ -121,7 +121,11 @@ function Hero(): React.ReactElement {
 
 function About(): React.ReactElement {
   return (
-    <section id="about" className="relative" style={{ backgroundColor: '#f7780b' }}>
+    <section
+      id="about"
+      className="relative scroll-mt-24"
+      style={{ backgroundColor: '#f7780b' }}
+    >
       <img
         src="/panteon/badges/great-place-to-work.png"
         alt="Great Place to Work certified badge"
@@ -152,7 +156,7 @@ function About(): React.ReactElement {
 
 function News(): React.ReactElement {
   return (
-    <section id="news" className="bg-panteon-bg">
+    <section id="news" className="scroll-mt-24 bg-panteon-bg">
       <div className="mx-auto max-w-[1140px] px-[15px] py-16">
         <header className="mb-8">
           <h2 className="text-center text-[18px] font-semibold uppercase leading-[1.2] tracking-[2px] text-panteon-eyebrow">
@@ -193,7 +197,7 @@ function News(): React.ReactElement {
 
 function Games(): React.ReactElement {
   return (
-    <section id="games" className="bg-panteon-surface-2">
+    <section id="games" className="scroll-mt-24 bg-panteon-surface-2">
       <div className="mx-auto max-w-[1140px] px-[15px] py-16">
         <header className="mb-10 text-center">
           <h2 className="text-[18px] font-semibold uppercase leading-[1.2] tracking-[2px] text-panteon-eyebrow">
