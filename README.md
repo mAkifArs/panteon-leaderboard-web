@@ -2,7 +2,10 @@
 
 Weekly leaderboard SPA built for the Panteon case study. React 19 +
 Vite + TypeScript, polled against a separate Fastify API
-([panteon-leaderboard-api](../panteon-leaderboard-api)).
+([panteon-leaderboard-api](https://github.com/mAkifArs/panteon-leaderboard-api)).
+
+- **Live demo:** https://panteon-leaderboard-web.pages.dev/leaderboard
+- **API:** https://panteon-leaderboard-api.onrender.com
 
 The work is intentionally over-documented for the review — the
 **`docs/adr/`** folder is the project's memory. If you have ten
@@ -73,7 +76,9 @@ ADR-015 (full top-100 render). ADR-016 is itself a same-day revision.
 
 For a deployment, point `VITE_API_BASE_URL` at the deployed API
 origin (set it on the host, or via a `.env.production` file). The
-frontend is fully static — any CDN or static host works.
+frontend is fully static — any CDN or static host works. The live
+demo runs on Cloudflare Pages with a `public/_redirects` rule so
+`BrowserRouter` deep links survive a refresh.
 
 ## Tech stack
 
@@ -114,8 +119,9 @@ gate — the rationale (and when one would be worth building) is in
 ## Backend
 
 The API lives in a separate repository:
-[panteon-leaderboard-api](../panteon-leaderboard-api). The split is
-covered by backend ADR-002 (separate repos) and backend ADR-008
+[panteon-leaderboard-api](https://github.com/mAkifArs/panteon-leaderboard-api),
+deployed at <https://panteon-leaderboard-api.onrender.com>. The split
+is covered by backend ADR-002 (separate repos) and backend ADR-008
 (polling-over-websockets, mirroring frontend ADR-003). The frontend
 treats the API as a stateless poll target; all money math, prize
 distribution, and idempotency live server-side per the case-study
