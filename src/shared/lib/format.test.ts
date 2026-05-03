@@ -39,4 +39,15 @@ describe('formatCompact', () => {
     expect(formatCompact('500')).toBe('500')
     expect(formatCompact('0')).toBe('0')
   })
+
+  it('formats trillions with two decimals and T suffix', () => {
+    expect(formatCompact('1500000000000')).toBe('1.50T')
+  })
+
+  it('falls back to scientific notation past 1e15', () => {
+    // The demo whale account ships with this value to exercise the
+    // BigInt path end-to-end.
+    expect(formatCompact('5000000000000000000')).toBe('5.00e18')
+    expect(formatCompact('1000000000000000')).toBe('1.00e15')
+  })
 })

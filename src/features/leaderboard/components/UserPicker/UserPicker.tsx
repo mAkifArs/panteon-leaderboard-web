@@ -3,7 +3,7 @@ import type { ViewEntry } from '@/shared/api/schemas'
 import { ErrorState } from '@/shared/components/ErrorState'
 import { RankBadge } from '@/features/leaderboard/components/RankBadge'
 import { useSampleUsers } from '@/features/leaderboard/hooks/useSampleUsers'
-import { formatScore } from '@/shared/lib/format'
+import { formatCompact } from '@/shared/lib/format'
 
 interface UserPickerProps {
   onSelect: (userId: string) => void
@@ -87,7 +87,7 @@ function SampleGrid({ users, onSelect }: SampleGridProps): React.ReactElement {
               <div className="flex flex-col">
                 <dt className="text-[10px] uppercase tracking-nav text-panteon-muted">Earned</dt>
                 <dd className="font-mono tabular-nums text-panteon-fg">
-                  {formatScore(user.score)}
+                  {formatCompact(user.score)}
                 </dd>
               </div>
             </dl>
