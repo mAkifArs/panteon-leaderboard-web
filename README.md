@@ -1,5 +1,7 @@
 # Panteon Leaderboard — Frontend
 
+[![CI](https://github.com/mAkifArs/panteon-leaderboard-web/actions/workflows/ci.yml/badge.svg)](https://github.com/mAkifArs/panteon-leaderboard-web/actions/workflows/ci.yml)
+
 Weekly leaderboard SPA built for the Panteon case study. React 19 +
 Vite + TypeScript, polled against a separate Fastify API
 ([panteon-leaderboard-api](https://github.com/mAkifArs/panteon-leaderboard-api)).
