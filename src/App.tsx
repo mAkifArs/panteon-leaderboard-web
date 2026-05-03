@@ -30,16 +30,15 @@ export function App(): React.ReactElement {
 }
 
 /**
- * Test-only sentinel: visiting any route with `?force_error=throw`
+ * Dev/test-only sentinel: visiting any route with `?force_error=throw`
  * raises a render exception so the app-level ErrorBoundary integration
- * (ADR-017) can be smoke-tested end-to-end in Cypress. The cost is one
- * `URLSearchParams.get` per render on a string compare; the only way a
- * real user trips this is by typing the query into the URL bar
- * themselves, in which case they get the boundary fallback that the
- * gate is designed to surface.
+ * (ADR-017) can be smoke-tested end-to-end in Cypress. Gated on
+ * `MODE !== 'production'` so a curious visitor on the deployed prod
+ * build cannot trigger it; Cypress runs against `vite build --mode test`
+ * which leaves the sentinel armed.
  */
 function ForceErrorGate({ children }: { children: React.ReactNode }): React.ReactNode {
-  if (typeof window !== 'undefined') {
+  if (import.meta.env.MODE !== 'production' && typeof window !== 'undefined') {
     const force = new URLSearchParams(window.location.search).get('force_error')
     if (force === 'throw') {
       throw new Error('Forced error for boundary smoke test')

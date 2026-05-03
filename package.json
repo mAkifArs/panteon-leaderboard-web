@@ -16,8 +16,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "start-server-and-test 'vite preview --port 4173' http://localhost:4173 'cypress run'",
-    "e2e:open": "start-server-and-test 'vite preview --port 4173' http://localhost:4173 'cypress open'",
+    "e2e": "vite build --mode test && start-server-and-test 'vite preview --port 4173' http://localhost:4173 'cypress run'",
+    "e2e:open": "vite build --mode test && start-server-and-test 'vite preview --port 4173' http://localhost:4173 'cypress open'",
     "e2e:dev": "start-server-and-test dev http://localhost:5173 'cypress open'"
   },
   "dependencies": {

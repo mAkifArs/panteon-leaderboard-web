@@ -121,11 +121,7 @@ function Hero(): React.ReactElement {
 
 function About(): React.ReactElement {
   return (
-    <section
-      id="about"
-      className="relative scroll-mt-24"
-      style={{ backgroundColor: '#f7780b' }}
-    >
+    <section id="about" className="relative scroll-mt-24 bg-panteon-orange-soft">
       <img
         src="/panteon/badges/great-place-to-work.png"
         alt="Great Place to Work certified badge"

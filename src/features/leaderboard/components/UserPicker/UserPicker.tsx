@@ -104,7 +104,7 @@ function SampleGrid({ users, onSelect }: SampleGridProps): React.ReactElement {
 function SampleSkeletons(): React.ReactElement {
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
-      {Array.from({ length: 3 }).map((_, i) => (
+      {Array.from({ length: 5 }).map((_, i) => (
         <li
           key={`sample-skel-${i.toString()}`}
           className="h-56 animate-pulse-soft rounded-2xl border border-panteon-border bg-panteon-surface"
