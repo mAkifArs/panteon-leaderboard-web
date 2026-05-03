@@ -61,6 +61,28 @@ describe('StickySelfBar', () => {
     expect(screen.getByTestId('sticky-self-bar')).toHaveAttribute('data-visible', 'false')
   })
 
+  it('points up when the target sits above the viewport', () => {
+    Object.defineProperty(window, 'innerHeight', { value: 800, configurable: true })
+    // Target has scrolled past the top — both edges are negative.
+    const target = makeTargetEl({ top: -200, bottom: -100 })
+    render(<StickySelfBar me={makeMe()} userId="user_self" targetEl={target} onJump={() => {}} />)
+    const bar = screen.getByTestId('sticky-self-bar')
+    expect(bar).toHaveAttribute('data-visible', 'true')
+    expect(bar).toHaveAttribute('data-direction', 'up')
+    expect(screen.getByRole('button', { name: /jump to your rank/i })).toHaveTextContent(/↑/)
+  })
+
+  it('points down when the target sits below the viewport', () => {
+    Object.defineProperty(window, 'innerHeight', { value: 800, configurable: true })
+    // Target hasn't scrolled into view yet — both edges past the bottom.
+    const target = makeTargetEl({ top: 1200, bottom: 1300 })
+    render(<StickySelfBar me={makeMe()} userId="user_self" targetEl={target} onJump={() => {}} />)
+    const bar = screen.getByTestId('sticky-self-bar')
+    expect(bar).toHaveAttribute('data-visible', 'true')
+    expect(bar).toHaveAttribute('data-direction', 'down')
+    expect(screen.getByRole('button', { name: /jump to your rank/i })).toHaveTextContent(/↓/)
+  })
+
   it('shows itself when the target has no element yet', () => {
     render(<StickySelfBar me={makeMe()} userId="user_self" targetEl={null} onJump={() => {}} />)
     expect(screen.getByTestId('sticky-self-bar')).toHaveAttribute('data-visible', 'true')

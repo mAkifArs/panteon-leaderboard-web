@@ -14,6 +14,11 @@ interface StickySelfBarProps {
   onJump: () => void
 }
 
+// Tri-state replaces the old hidden boolean. The arrow on the
+// jump button needs to know whether the target sits above or
+// below the viewport — a flag wouldn't carry that signal.
+type SelfState = 'above' | 'below' | 'hidden'
+
 const NUMBER = new Intl.NumberFormat('en-US')
 
 export function StickySelfBar({
@@ -23,11 +28,15 @@ export function StickySelfBar({
   onJump,
 }: StickySelfBarProps): React.ReactElement | null {
   const selfEntry = me.cluster.find((entry) => entry.userId === userId) ?? null
-  const [hidden, setHidden] = useState(false)
+  // Default to 'below' so that on first paint (target not yet
+  // measured, or null because the user hasn't entered the cluster
+  // yet) the call to action points down — the natural place to
+  // scroll *toward* on a freshly loaded page.
+  const [state, setState] = useState<SelfState>('below')
 
   useEffect(() => {
     if (!targetEl) {
-      setHidden(false)
+      setState('below')
       return
     }
     const check = (): void => {
@@ -37,8 +46,13 @@ export function StickySelfBar({
       // self row in the top-100 list, or the "Around You" cluster.
       // The bar exists to lead the user *to* the target; once the target
       // is on screen, the bar is redundant.
-      const intersects = rect.top < vh && rect.bottom > 0
-      setHidden(intersects)
+      if (rect.top < vh && rect.bottom > 0) {
+        setState('hidden')
+      } else if (rect.bottom <= 0) {
+        setState('above')
+      } else {
+        setState('below')
+      }
     }
     check()
     window.addEventListener('scroll', check, { passive: true })
@@ -52,11 +66,14 @@ export function StickySelfBar({
   if (!selfEntry) return null
 
   const flag = flagFromCountry(selfEntry.country)
+  const hidden = state === 'hidden'
+  const arrow = state === 'above' ? '↑' : '↓'
 
   return (
     <div
       data-testid="sticky-self-bar"
       data-visible={hidden ? 'false' : 'true'}
+      data-direction={state === 'above' ? 'up' : 'down'}
       className={clsx(
         'pointer-events-none sticky bottom-4 z-30 mt-6 w-full',
         'duration-250 transition-[opacity,transform]',
@@ -112,8 +129,8 @@ export function StickySelfBar({
           aria-label="Jump to your rank"
           className="whitespace-nowrap rounded-md bg-panteon-orange px-2.5 py-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.06em] text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-panteon-orange focus-visible:ring-offset-2 focus-visible:ring-offset-panteon-bg md:px-3 md:py-2 md:text-[10px]"
         >
-          <span className="md:hidden">Jump ↓</span>
-          <span className="hidden md:inline">Jump to me ↓</span>
+          <span className="md:hidden">Jump {arrow}</span>
+          <span className="hidden md:inline">Jump to me {arrow}</span>
         </button>
       </div>
     </div>
