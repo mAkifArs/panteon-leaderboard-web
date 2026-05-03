@@ -105,15 +105,20 @@ clock assumptions. One `setInterval`, cleaned up on unmount.
 
 ---
 
-## State management — Zustand, not Context
+## State management — polling registry, no global store
 
-Discussion: _"if 100 rows subscribe to the same Context, what
-happens on every leaderboard tick?"_ Answer: 100 re-renders.
-Zustand with selectors gives O(1) re-renders per tick — only the
-row whose data changed.
+Initial decision was Zustand (ADR-002), reasoning: _"if 100 rows
+subscribe to the same Context, what happens on every leaderboard
+tick?"_ Answer: 100 re-renders. Zustand with selectors would give
+O(1) re-renders per tick.
 
-react-scan confirmed this in practice. Decision documented in
-ADR-002.
+That decision was reversed once the polling registry
+(`src/shared/hooks/usePolling.ts`) shipped. The registry already
+holds one entry per `key` and re-emits via `useSyncExternalStore`,
+which gave us the same per-row subscription granularity without
+adding a second store. ADR-014 supersedes ADR-002 with the full
+walkthrough — Zustand is on standby for any future feature that
+needs cross-tree, non-URL, non-server state.
 
 ---
 
@@ -155,7 +160,8 @@ the backend repo gets from `postgres-patterns` and
 
 ## What I did with AI
 
-- Vite + TS + Tailwind + Zustand scaffold.
+- Vite + TS + Tailwind scaffold (Zustand was in the initial draft;
+  removed once ADR-014 made it redundant).
 - Initial component JSX/CSS drafts (read line-by-line).
 - react-window integration boilerplate (parked unused for now).
 - Animation timing and easing curves.

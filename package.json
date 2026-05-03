@@ -1,7 +1,7 @@
 {
   "name": "panteon-leaderboard-web",
   "version": "0.1.0",
-  "description": "Weekly leaderboard SPA. React 19 + Vite + TS + Tailwind + Zustand.",
+  "description": "Weekly leaderboard SPA. React 19 + Vite + TS + Tailwind, polling-based.",
   "type": "module",
   "private": true,
   "engines": {
