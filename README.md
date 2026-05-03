@@ -82,7 +82,7 @@ starting [the API repo](https://github.com/mAkifArs/panteon-leaderboard-api).
 | `bun run build` | Type-check + production build |
 | `bun run preview` | Serve the production build (port 4173) |
 | `bun run typecheck` | `tsc -b --noEmit`, strict mode |
-| `bun run test` | Vitest — 23 files, 133 unit/component cases |
+| `bun run test` | Vitest — 27 files, 156 unit/component cases |
 | `bun run e2e` | Cypress — 16 flows, builds in test mode and runs against `vite preview` |
 | `bun run lint` | ESLint, `--max-warnings 0` |
 | `bun run format` | Prettier write |
@@ -165,7 +165,7 @@ Redux, no Context for shared state. ADR-014 has the full walkthrough.
 ## Tests
 
 ```bash
-bun run test    # 23 files, 133 unit/component cases
+bun run test    # 27 files, 156 unit/component cases
 bun run e2e     # 16 Cypress flows, against a test-mode vite preview build
 ```
 
