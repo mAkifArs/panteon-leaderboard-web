@@ -165,7 +165,14 @@ function News(): React.ReactElement {
               key={item.title}
               className="group overflow-hidden rounded-xl border border-panteon-border bg-panteon-surface transition-colors hover:border-panteon-orange"
             >
-              <a href="#" className="block">
+              <a
+                href="#"
+                aria-disabled="true"
+                onClick={(e) => {
+                  e.preventDefault()
+                }}
+                className="block cursor-default"
+              >
                 <div className="aspect-[1200/491] w-full overflow-hidden bg-panteon-surface-2">
                   <img
                     src={item.img}

@@ -1,7 +1,8 @@
 /**
  * Footer mirrors the panteon.games style: dark band, muted legal
- * link strip, wordmark and copyright. No external links — this is
- * a case study, not the live company site.
+ * link strip, wordmark and copyright. The legal items are visual
+ * placeholders for the case study — actual destinations live on
+ * the company site, not this clone, so the anchors are inert.
  */
 
 const LEGAL_LINKS = ['Privacy Policy', 'Cookie Policy', 'Terms of Use', 'Data Protection'] as const
@@ -29,7 +30,11 @@ export function SiteFooter(): React.ReactElement {
               <li key={label}>
                 <a
                   href="#"
-                  className="text-xs uppercase tracking-nav text-panteon-muted transition-colors hover:text-panteon-fg"
+                  aria-disabled="true"
+                  onClick={(e) => {
+                    e.preventDefault()
+                  }}
+                  className="cursor-default text-xs uppercase tracking-nav text-panteon-muted transition-colors hover:text-panteon-fg"
                 >
                   {label}
                 </a>
